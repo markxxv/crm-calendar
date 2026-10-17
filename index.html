@@ -31,11 +31,11 @@
         --hour-min-height: 3.5rem;
         --event-dot-size: 0.375rem;
 
-        --event-viewing: #6f8698;
-        --event-call: #94809c;
-        --event-docs: #bd9969;
-        --event-meeting: #7a9988;
-        --event-reminder: #a8a8a8;
+        --event-viewing: #60a5fa;
+        --event-call: #a78bfa;
+        --event-docs: #fbbf24;
+        --event-meeting: #4ade80;
+        --event-reminder: #fb7185;
       }
 
       [x-cloak] {
@@ -113,9 +113,6 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <span class="hidden text-xs text-zinc-400 xl:inline">
-            Демонстрационный прототип
-          </span>
           <button
             type="button"
             @click="openCreate()"
@@ -135,9 +132,9 @@
         </div>
       </header>
 
-      <main class="min-w-0 lg:grid lg:grid-cols-[minmax(0,1fr)_var(--today-panel-width)]">
+      <main class="grid min-w-0 lg:grid-cols-[minmax(0,1fr)_var(--today-panel-width)]">
         <!-- Monthly calendar -->
-        <section class="relative flex min-w-0 flex-col" aria-label="Календарь месяца">
+        <section class="relative order-2 flex min-w-0 flex-col lg:order-1" aria-label="Календарь месяца">
           <div class="px-4 pt-6 pb-5 sm:px-6 lg:px-7">
             <div class="flex flex-wrap items-center justify-between gap-4">
               <div class="flex items-center gap-4">
@@ -179,20 +176,7 @@
               </button>
             </div>
 
-            <div
-              class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400"
-              aria-label="Сводка месяца"
-            >
-              <span><span x-text="monthEvents.length"></span> событий</span>
-              <span class="size-1 rounded-full bg-zinc-300"></span>
-              <span><span x-text="busyDays"></span> загруженных дней</span>
-              <span class="size-1 rounded-full bg-zinc-300"></span>
-              <span class="font-medium text-zinc-600">
-                <span x-text="attentionCount"></span> требуют внимания
-              </span>
-            </div>
-
-            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
               <div class="flex max-w-full items-center gap-1 overflow-x-auto pb-1">
                 <template x-for="type in eventTypes" :key="type.id">
                   <button
@@ -251,9 +235,16 @@
                   <button
                     type="button"
                     @click="openDay(cell.key)"
-                    :aria-label="formatDate(cell.key) + ', событий: ' + eventsFor(cell.key).length"
+                    :aria-label="
+                      cell.outside
+                        ? 'Перейти к ' + formatDate(cell.key)
+                        : cell.weekend
+                          ? formatDate(cell.key) + ', выходной'
+                          : formatDate(cell.key) + ', событий: ' + cellEventCount(cell)
+                    "
                     :class="{
-                      'bg-zinc-50/60': cell.outside,
+                      'bg-zinc-50/70': cell.outside,
+                      'bg-zinc-50/80': cell.weekend && !cell.outside,
                       'bg-zinc-50': cell.key === today,
                       'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
                     }"
@@ -263,21 +254,23 @@
                       <span
                         :class="{
                           'text-zinc-300': cell.outside,
+                          'text-zinc-400': cell.weekend && !cell.outside && cell.key !== today,
+                          'text-zinc-600': !cell.outside && !cell.weekend && cell.key !== today,
                           'bg-zinc-900 text-white': cell.key === today,
                         }"
-                        class="grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium text-zinc-600"
+                        class="grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium"
                         x-text="cell.day"
                       ></span>
                       <span
                         class="text-[0.625rem] font-semibold text-zinc-400"
-                        x-show="eventsFor(cell.key).length > 3"
-                        x-text="eventsFor(cell.key).length"
+                        x-show="cellEventCount(cell) > 3"
+                        x-text="cellEventCount(cell)"
                       ></span>
                     </div>
 
                     <div class="flex min-w-0 w-full flex-col gap-2">
                       <template
-                        x-for="event in eventsFor(cell.key).slice(0, 2)"
+                        x-for="event in cellEvents(cell).slice(0, 2)"
                         :key="event.id"
                       >
                         <div class="flex min-w-0 items-center gap-1.5">
@@ -302,13 +295,13 @@
                     </div>
 
                     <span
-                      x-show="eventsFor(cell.key).length > 2"
+                      x-show="cellEventCount(cell) > 2"
                       class="mt-2 pl-3 text-[0.625rem] font-semibold text-zinc-500"
-                      x-text="'+ ещё ' + (eventsFor(cell.key).length - 2)"
+                      x-text="'+ ещё ' + (cellEventCount(cell) - 2)"
                     ></span>
 
                     <div
-                      x-show="!cell.outside && eventsFor(cell.key).length"
+                      x-show="cellEventCount(cell) > 0"
                       class="absolute right-3 bottom-3 left-3 h-0.5 overflow-hidden rounded-full bg-zinc-100"
                     >
                       <div
@@ -423,24 +416,17 @@
 
         <!-- Hourly agenda: always Today, independent of selected day -->
         <aside
-          class="flex min-w-0 flex-col border-t border-zinc-200 lg:sticky lg:top-0 lg:h-[calc(100vh-var(--header-height))] lg:min-h-(--panel-min-height) lg:border-t-0 lg:border-l"
+          class="order-1 flex min-w-0 flex-col border-b border-zinc-200 lg:order-2 lg:sticky lg:top-0 lg:h-[calc(100vh-var(--header-height))] lg:min-h-(--panel-min-height) lg:border-b-0 lg:border-l"
           aria-label="Сегодня по часам"
         >
           <div class="shrink-0 border-b border-zinc-200 px-6 pt-7 pb-5">
-            <p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase">
-              Ваш день
-            </p>
-            <h2 class="mt-2 text-[1.375rem] font-semibold tracking-tight">
+            <h2 class="text-[1.375rem] font-semibold tracking-tight">
               Сегодня
               <span class="font-normal text-zinc-400">
                 · <span x-text="todayLabel"></span>
               </span>
             </h2>
-            <p class="mt-2 text-xs text-zinc-400">
-              <span x-text="todayWeekday"></span> · Всё на одной временной шкале
-            </p>
-
-            <div class="mt-5 flex flex-wrap items-center gap-2">
+            <div class="mt-4 flex flex-wrap items-center gap-2">
               <span class="rounded-md bg-zinc-100 px-2.5 py-1.5 text-[0.6875rem] text-zinc-600">
                 <strong class="text-zinc-900" x-text="timedToday.length"></strong>
                 по времени
@@ -567,9 +553,6 @@
             </section>
           </div>
 
-          <div class="shrink-0 border-t border-zinc-200 px-6 py-3 text-[0.6875rem] leading-relaxed text-zinc-400">
-            Цветные точки обозначают тип события, а не его срочность.
-          </div>
         </aside>
       </main>
     </div>
