@@ -69,14 +69,6 @@ function calendarApp() {
       }).format(fromKey(this.today));
     },
 
-    get todayWeekday() {
-      return titleCase(
-        new Intl.DateTimeFormat("ru-RU", {
-          weekday: "long",
-        }).format(fromKey(this.today)),
-      );
-    },
-
     get visibleEvents() {
       const query = this.search.trim().toLocaleLowerCase("ru-RU");
 
@@ -88,25 +80,6 @@ function calendarApp() {
 
         return typeMatches && (!query || text.includes(query));
       });
-    },
-
-    get monthEvents() {
-      const prefix = toKey(this.currentMonth).slice(0, 7);
-      return this.visibleEvents.filter((event) => event.date.startsWith(prefix));
-    },
-
-    get busyDays() {
-      const counts = {};
-
-      this.monthEvents.forEach((event) => {
-        counts[event.date] = (counts[event.date] || 0) + 1;
-      });
-
-      return Object.values(counts).filter((count) => count >= 6).length;
-    },
-
-    get attentionCount() {
-      return this.monthEvents.filter((event) => event.attention && !event.done).length;
     },
 
     get calendarDays() {
