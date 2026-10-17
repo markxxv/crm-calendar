@@ -61,6 +61,11 @@
         -webkit-font-smoothing: antialiased;
       }
 
+      .selection-chip {
+        background: #fafafa;
+        background: color-mix(in srgb, var(--selection-color) 11%, white);
+      }
+
       .icon {
         fill: none;
         stroke: currentColor;
@@ -694,7 +699,8 @@
                   @click="toggleDetailMenu('statusPickerOpen')"
                   :aria-expanded="statusPickerOpen"
                   aria-label="Выбрать статус события"
-                  class="flex w-full items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-500"
+                  :style="'--selection-color: ' + optionColor('status', detailEvent.status)"
+                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
                 >
                   <span class="flex min-w-0 items-center gap-2">
                     <svg
@@ -752,7 +758,8 @@
                   @click="toggleDetailMenu('priorityPickerOpen')"
                   :aria-expanded="priorityPickerOpen"
                   aria-label="Выбрать приоритет события"
-                  class="flex w-full items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-500"
+                  :style="'--selection-color: ' + optionColor('priority', detailEvent.priority)"
+                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
                 >
                   <span class="flex min-w-0 items-center gap-2">
                     <svg
@@ -816,7 +823,7 @@
                     >
                       <button
                         type="button"
-                        @click.stop="activeStaffPopover = activeStaffPopover === person.id ? null : person.id"
+                        @click.stop="activeStaffPopover = person.id"
                         :aria-label="'Контакты: ' + person.name"
                         :aria-expanded="activeStaffPopover === person.id"
                         class="relative grid size-9 place-items-center rounded-full bg-zinc-100 ring-2 ring-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
