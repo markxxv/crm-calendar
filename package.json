@@ -1,0 +1,14 @@
+{
+  "name": "crm-calendar",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tailwind CSS and Alpine.js real estate calendar prototype",
+  "scripts": {
+    "format": "prettier --write index.html app.js README.md package.json .prettierrc.json",
+    "format:check": "prettier --check index.html app.js README.md package.json .prettierrc.json",
+    "check:js": "node --check app.js"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
