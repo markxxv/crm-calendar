@@ -122,6 +122,7 @@ function calendarApp() {
           key: toKey(date),
           day: date.getDate(),
           outside: date.getMonth() !== month,
+          weekend: date.getDay() === 0 || date.getDay() === 6,
         };
       });
     },
@@ -168,6 +169,16 @@ function calendarApp() {
         .sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
     },
 
+    // Adjacent-month and weekend cells are deliberately summary-free.
+    // Real events stay in the data and remain accessible in the day drawer.
+    cellEvents(cell) {
+      return cell.outside || cell.weekend ? [] : this.eventsFor(cell.key);
+    },
+
+    cellEventCount(cell) {
+      return this.cellEvents(cell).length;
+    },
+
     eventsAtHour(hour) {
       return this.timedToday.filter((event) => Number(event.time.slice(0, 2)) === hour);
     },
@@ -206,6 +217,16 @@ function calendarApp() {
     },
 
     openDay(date) {
+      const selected = fromKey(date);
+
+      // Clicking an adjacent month's day switches the visible month first.
+      if (
+        selected.getFullYear() !== this.currentMonth.getFullYear() ||
+        selected.getMonth() !== this.currentMonth.getMonth()
+      ) {
+        this.currentMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
+      }
+
       this.selectedDate = date;
     },
 
@@ -312,10 +333,14 @@ function calendarApp() {
         const countDays = new Date(year, month + 1, 0).getDate();
 
         for (let day = 1; day <= countDays; day++) {
-          const date = toKey(new Date(year, month, day, 12));
+          const calendarDate = new Date(year, month, day, 12);
+          const date = toKey(calendarDate);
+
+          // Weekend demo noise is unnecessary. Today's agenda remains populated.
+          if (calendarDate.getDay() === 0 || calendarDate.getDay() === 6) continue;
           if (date === this.today) continue;
 
-          let count = day % 7 === 0 ? 1 : 2 + ((day * 7 + 3) % 5);
+          let count = 2 + ((day * 7 + 3) % 5);
           if ([6, 12, 19, 20, 23, 28].includes(day)) count += 4;
 
           for (let index = 0; index < count; index++) {
