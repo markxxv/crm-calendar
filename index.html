@@ -384,7 +384,11 @@
                     <span x-text="section.items.length"></span>
                   </h3>
                   <template x-for="event in section.items" :key="event.id">
-                    <div class="flex gap-2.5 rounded-lg px-1 py-2.5 hover:bg-zinc-50">
+                    <button
+                      type="button"
+                      @click="openEvent(event.id)"
+                      class="flex w-full items-start gap-2.5 rounded-lg px-1 py-2.5 text-left hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-zinc-400"
+                    >
                       <span
                         class="mt-1.5 size-(--event-dot-size) shrink-0 rounded-full"
                         :style="'background-color: var(--event-' + event.type + ')'"
@@ -407,7 +411,18 @@
                           </span>
                         </p>
                       </div>
-                    </div>
+                      <span x-show="event.staffIds.length > 1" class="ml-auto flex shrink-0 -space-x-1.5">
+                        <template x-for="person in staff.filter((item) => event.staffIds.includes(item.id))" :key="person.id">
+                          <img
+                            :src="person.photo"
+                            :alt="person.name"
+                            :title="person.name"
+                            class="size-5 rounded-full border-2 border-white object-cover"
+                            loading="lazy"
+                          />
+                        </template>
+                      </span>
+                    </button>
                   </template>
                 </section>
               </template>
@@ -466,13 +481,17 @@
                         <use href="#i-check"></use>
                       </svg>
                     </button>
-                    <div class="min-w-0 flex-1">
-                      <p
-                        class="text-xs font-medium"
+                    <button
+                      type="button"
+                      @click="openEvent(event.id)"
+                      class="min-w-0 flex-1 text-left focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-zinc-400"
+                    >
+                      <span
+                        class="block text-xs font-medium"
                         :class="event.done && 'text-zinc-400 line-through'"
                         x-text="event.title"
-                      ></p>
-                      <p class="mt-1 truncate text-[0.6875rem] text-zinc-400">
+                      ></span>
+                      <span class="mt-1 block truncate text-[0.6875rem] text-zinc-400">
                         <span x-text="labelFor(event)"></span>
                         <span
                           x-show="event.attention && !event.done"
@@ -480,8 +499,8 @@
                         >
                           · Требует внимания
                         </span>
-                      </p>
-                    </div>
+                      </span>
+                    </button>
                     <span
                       class="mt-1 size-(--event-dot-size) shrink-0 rounded-full"
                       :style="'background-color: var(--event-' + event.type + ')'"
@@ -514,7 +533,7 @@
                       <template x-for="event in eventsAtHour(hour)" :key="event.id">
                         <button
                           type="button"
-                          @click="openDay(today)"
+                          @click="openEvent(event.id)"
                           class="flex min-w-0 items-start gap-2 rounded-lg bg-white px-3 py-2 text-left shadow-[0_1px_3px_rgba(0,0,0,0.035)] transition-colors hover:bg-zinc-100"
                           :class="event.done && 'opacity-60'"
                         >
@@ -534,10 +553,20 @@
                               x-text="labelFor(event)"
                             ></span>
                           </span>
-                          <span
-                            class="shrink-0 text-[0.625rem] tabular-nums text-zinc-400"
-                            x-text="event.time"
-                          ></span>
+                          <span class="flex shrink-0 flex-col items-end gap-1">
+                            <span class="text-[0.625rem] tabular-nums text-zinc-400" x-text="event.time"></span>
+                            <span x-show="event.staffIds.length > 1" class="flex -space-x-1.5">
+                              <template x-for="person in staff.filter((item) => event.staffIds.includes(item.id))" :key="person.id">
+                                <img
+                                  :src="person.photo"
+                                  :alt="person.name"
+                                  :title="person.name"
+                                  class="size-5 rounded-full border-2 border-white object-cover"
+                                  loading="lazy"
+                                />
+                              </template>
+                            </span>
+                          </span>
                         </button>
                       </template>
                     </div>
