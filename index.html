@@ -401,7 +401,7 @@
               <template x-for="day in weekDays" :key="day.key">
                 <section
                   :class="day.weekend ? 'bg-zinc-50/80' : day.key === today ? 'bg-blue-50/40' : 'bg-white'"
-                  class="min-w-0 p-3 xl:min-h-(--week-column-min-height)"
+                  class="min-w-0 p-1.5 xl:min-h-(--week-column-min-height)"
                 >
                   <div class="flex items-center justify-between gap-2">
                     <button
