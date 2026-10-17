@@ -127,6 +127,15 @@
         <symbol id="i-alert" viewBox="0 0 24 24">
           <path d="M12 3 2 20h20L12 3ZM12 9v5m0 3v.01" />
         </symbol>
+        <symbol id="i-home" viewBox="0 0 24 24">
+          <path d="m3 10 9-7 9 7v10H3V10Zm6 10v-7h6v7" />
+        </symbol>
+        <symbol id="i-arrow-up-right" viewBox="0 0 24 24">
+          <path d="M7 17 17 7M8 7h9v9" />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-7-7Zm0 0v7h7M8 14h8M8 18h6" />
+        </symbol>
       </defs>
     </svg>
 
@@ -1007,6 +1016,102 @@
                 </div>
               </div>
             </div>
+            <!-- Compact meeting/task brief -->
+            <section x-show="detailEvent.description" class="mt-5">
+              <h3 class="text-xs font-semibold text-zinc-900">Задача</h3>
+              <p
+                class="mt-1.5 text-[0.8125rem] leading-5 text-zinc-600"
+                x-text="detailEvent.description"
+              ></p>
+              <p x-show="detailEvent.goal" class="mt-2 text-xs leading-5 text-zinc-500">
+                <span class="font-semibold text-zinc-700">Результат:</span>
+                <span x-text="detailEvent.goal"></span>
+              </p>
+            </section>
+
+            <!-- Linked real estate: shown only for records that reference a property. -->
+            <section x-show="detailProperty" class="mt-5">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-xs font-semibold text-zinc-900">Объект</h3>
+                <span
+                  class="text-[0.6875rem] text-zinc-400"
+                  x-text="detailProperty?.reference"
+                ></span>
+              </div>
+              <a
+                :href="detailProperty?.url"
+                :aria-label="'Открыть объект ' + (detailProperty?.title || '')"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-2 flex min-w-0 overflow-hidden rounded-xl bg-zinc-50 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-500"
+              >
+                <div class="relative flex h-28 w-28 shrink-0 items-center justify-center bg-zinc-200 sm:w-30">
+                  <svg class="icon size-7 text-zinc-400" aria-hidden="true">
+                    <use href="#i-home"></use>
+                  </svg>
+                  <img
+                    :src="detailProperty?.image"
+                    :alt="detailProperty?.title"
+                    @error="$el.remove()"
+                    class="absolute inset-0 size-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-2.5">
+                  <div class="flex min-w-0 items-center justify-between gap-1">
+                    <strong class="truncate text-xs font-semibold text-zinc-900" x-text="detailProperty?.title"></strong>
+                    <svg class="icon size-3.5 shrink-0 text-zinc-400" aria-hidden="true">
+                      <use href="#i-arrow-up-right"></use>
+                    </svg>
+                  </div>
+                  <span
+                    class="truncate text-[0.6875rem] text-zinc-500"
+                    x-text="detailProperty?.location"
+                  ></span>
+                  <div class="flex flex-wrap gap-x-2 text-[0.6875rem] text-zinc-500">
+                    <span x-text="detailProperty?.area"></span>
+                    <span x-text="detailProperty?.beds"></span>
+                    <span x-text="detailProperty?.baths"></span>
+                  </div>
+                  <strong
+                    class="text-xs font-semibold text-zinc-900"
+                    x-text="detailProperty?.price"
+                  ></strong>
+                </div>
+              </a>
+            </section>
+
+            <!-- Visual mock attachments; no fake download links. -->
+            <section x-show="detailEvent.attachments.length" class="mt-5">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-xs font-semibold text-zinc-900">Файлы</h3>
+                <span
+                  class="text-[0.6875rem] tabular-nums text-zinc-400"
+                  x-text="detailEvent.attachments.length"
+                ></span>
+              </div>
+              <div class="mt-2 flex flex-col gap-1.5">
+                <template x-for="file in detailEvent.attachments" :key="file.id">
+                  <div class="flex min-w-0 items-center gap-2.5 rounded-lg bg-zinc-50 px-2.5 py-2">
+                    <span class="grid size-7 shrink-0 place-items-center rounded-md bg-white text-zinc-500">
+                      <svg class="icon size-4" aria-hidden="true">
+                        <use href="#i-file"></use>
+                      </svg>
+                    </span>
+                    <span
+                      class="min-w-0 flex-1 truncate text-xs font-medium text-zinc-700"
+                      :title="file.name"
+                      x-text="file.name"
+                    ></span>
+                    <span
+                      class="shrink-0 text-[0.625rem] text-zinc-400"
+                      x-text="file.type + ' · ' + file.size"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+            </section>
+
           </div>
         </aside>
       </template>
