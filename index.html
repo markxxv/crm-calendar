@@ -244,7 +244,7 @@
                     "
                     :class="{
                       'bg-zinc-50/70': cell.outside,
-                      'bg-zinc-50/80': cell.weekend && !cell.outside,
+                      'bg-zinc-50/80': cell.weekend && !cell.outside && cell.key !== today,
                       'bg-zinc-50': cell.key === today,
                       'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
                     }"
