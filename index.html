@@ -58,7 +58,7 @@
 
   <body
     x-data="calendarApp"
-    @keydown.escape.window="modalOpen = false; selectedDate = null"
+    @keydown.escape.window="modalOpen = false; selectedDate = null; closeEvent()"
     class="min-h-screen bg-white font-sans text-zinc-900"
   >
     <svg aria-hidden="true" class="absolute size-0 overflow-hidden">
@@ -223,25 +223,28 @@
 
               <div class="grid grid-cols-7 auto-rows-[minmax(var(--day-min-height-mobile),1fr)] sm:auto-rows-[minmax(var(--day-min-height),1fr)]">
                 <template x-for="cell in calendarDays" :key="cell.key">
-                  <button
-                    type="button"
-                    @click="openDay(cell.key)"
-                    :aria-label="
-                      cell.outside
-                        ? 'Перейти к ' + formatDate(cell.key)
-                        : cell.weekend
-                          ? formatDate(cell.key) + ', выходной'
-                          : formatDate(cell.key) + ', событий: ' + cellEventCount(cell)
-                    "
+                  <div
                     :class="{
                       'bg-zinc-50/70': cell.outside,
                       'bg-zinc-50/80': cell.weekend && !cell.outside && cell.key !== today,
                       'bg-zinc-50': cell.key === today,
                       'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
                     }"
-                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-100/80 px-1 pt-1.5 pb-2 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600 sm:px-2.5 sm:pt-2.5 sm:pb-5"
+                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-100/80 px-1 pt-1.5 pb-2 text-left transition-colors hover:bg-zinc-50 sm:px-2.5 sm:pt-2.5 sm:pb-5"
                   >
-                    <div class="mb-1.5 flex w-full items-center justify-between gap-0.5 sm:gap-1">
+                    <button
+                      type="button"
+                      @click="openDay(cell.key)"
+                      :aria-label="
+                        cell.outside
+                          ? 'Перейти к ' + formatDate(cell.key)
+                          : cell.weekend
+                            ? formatDate(cell.key) + ', выходной'
+                            : formatDate(cell.key) + ', событий: ' + cellEventCount(cell)
+                      "
+                      class="absolute inset-0 z-0 w-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-zinc-600"
+                    ></button>
+                    <div class="pointer-events-none relative mb-1.5 flex w-full items-center justify-between gap-0.5 sm:gap-1">
                       <span
                         :class="{
                           'text-zinc-300': cell.outside,
@@ -259,12 +262,17 @@
                       ></span>
                     </div>
 
-                    <div class="hidden min-w-0 w-full flex-col gap-1.5 sm:flex">
+                    <div class="relative z-10 hidden min-w-0 w-full flex-col gap-1.5 sm:flex">
                       <template
                         x-for="event in cellEvents(cell).slice(0, 2)"
                         :key="event.id"
                       >
-                        <div class="flex min-w-0 items-center gap-1.5">
+                        <button
+                          type="button"
+                          @click="openEvent(event.id)"
+                          :aria-label="'Открыть событие: ' + event.title"
+                          class="flex min-w-0 items-center gap-1.5 rounded-sm text-left hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-400"
+                        >
                           <span
                             class="size-(--event-dot-size) shrink-0 rounded-full"
                             :style="'background-color: var(--event-' + event.type + ')'"
@@ -281,11 +289,11 @@
                             x-text="event.title"
                             :title="event.title"
                           ></span>
-                        </div>
+                        </button>
                       </template>
                     </div>
 
-                    <div class="mt-1 flex items-center gap-1 sm:hidden">
+                    <div class="pointer-events-none mt-1 flex items-center gap-1 sm:hidden">
                       <template x-for="event in cellEvents(cell).slice(0, 3)" :key="event.id">
                         <span
                           class="size-(--event-dot-size) rounded-full"
@@ -297,20 +305,20 @@
 
                     <span
                       x-show="cellEventCount(cell) > 2"
-                      class="mt-1 hidden pl-3 text-[0.625rem] font-medium text-zinc-400 sm:block"
+                      class="pointer-events-none mt-1 hidden pl-3 text-[0.625rem] font-medium text-zinc-400 sm:block"
                       x-text="'+ ещё ' + (cellEventCount(cell) - 2)"
                     ></span>
 
                     <div
                       x-show="cellEventCount(cell) > 0"
-                      class="absolute right-2 bottom-2 left-2 hidden h-0.5 overflow-hidden rounded-full bg-zinc-100 sm:block"
+                      class="pointer-events-none absolute right-2 bottom-2 left-2 hidden h-0.5 overflow-hidden rounded-full bg-zinc-100 sm:block"
                     >
                       <div
                         class="h-full w-(--load) rounded-full bg-zinc-400"
                         :style="'--load: ' + dayLoad(cell.key) + '%'"
                       ></div>
                     </div>
-                  </button>
+                  </div>
                 </template>
               </div>
             </div>
