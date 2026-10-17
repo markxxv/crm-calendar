@@ -54,6 +54,66 @@ function calendarApp() {
     { id: "urgent", label: "Срочный", icon: "alert" },
   ];
 
+  // Listing facts are from the linked Spain Costas property page.
+  const properties = {
+    canVerboom2: {
+      id: "canVerboom2",
+      title: "Can Verboom 2",
+      reference: "SC-01246",
+      location: "Premià de Dalt",
+      price: "от 482 000 €",
+      area: "96 м²",
+      beds: "3 спальни",
+      baths: "2 ванные",
+      image: "https://profinca.es/wp-content/uploads/2025/09/LaLlaveDeOro-CanVerboom2-Exterior01-Aerea-2-2048x1152.jpg",
+      url: "https://spain-costas.com/object/can-verboom-2-a-new-step-towards-a-life-that-inspires",
+    },
+  };
+
+  const defaultNotes = {
+    viewing: {
+      description: "Показать объект клиенту, пройти по планировке, отделке и инфраструктуре. Обсудить ожидания и важные условия покупки.",
+      goal: "Зафиксировать обратную связь и согласовать следующий шаг.",
+    },
+    meeting: {
+      description: "Обсудить условия предложения, сроки сделки и список необходимых документов. Уточнить вопросы клиента и зафиксировать договорённости.",
+      goal: "Согласовать дальнейшие действия и ответственных.",
+    },
+    docs: {
+      description: "Проверить актуальные документы по запросу клиента, уточнить недостающие сведения и подготовить комплект к отправке.",
+      goal: "Передать согласованный пакет документов.",
+    },
+    call: {
+      description: "Связаться с клиентом, уточнить его решение и ответить на вопросы по предложению.",
+      goal: "Зафиксировать результат звонка и дату следующего контакта.",
+    },
+    reminder: {
+      description: "Проверить статус вопроса, собрать недостающую информацию и напомнить участникам о договорённостях.",
+      goal: "Закрыть текущий вопрос или назначить следующий срок.",
+    },
+  };
+
+  const propertyNotes = {
+    meeting: {
+      description: "Встреча по Can Verboom 2: обсудить варианты планировок, комплектацию, сроки передачи и условия бронирования. Разобрать вопросы покупателя по проекту.",
+      goal: "Подтвердить интерес и согласовать отправку предложения.",
+    },
+    viewing: {
+      description: "Показать покупателю Can Verboom 2. Обратить внимание на планировки, террасы, общую территорию с бассейном и парковочные места.",
+      goal: "Получить обратную связь и договориться о следующем шаге.",
+    },
+    docs: {
+      description: "Сверить планировки и описание Can Verboom 2, подготовить материалы для клиента и ответить на вопросы по условиям проекта.",
+      goal: "Отправить клиенту согласованный комплект материалов.",
+    },
+  };
+
+  const propertyFiles = [
+    { id: "cv-plan", name: "Планировки Can Verboom 2.pdf", type: "PDF", size: "1,8 МБ" },
+    { id: "cv-offer", name: "Презентация проекта.pdf", type: "PDF", size: "4,2 МБ" },
+    { id: "cv-notes", name: "Вопросы к встрече.docx", type: "DOCX", size: "46 КБ" },
+  ];
+
   // Only the three confirmed agency team members are used in the prototype.
   const staff = [
     {
@@ -97,6 +157,7 @@ function calendarApp() {
     typeNames,
     statuses,
     priorities,
+    properties,
     staff,
     events: [],
     nextId: 1,
@@ -245,6 +306,11 @@ function calendarApp() {
 
     get detailEvent() {
       return this.events.find((event) => event.id === this.detailEventId) || null;
+    },
+
+    get detailProperty() {
+      const id = this.detailEvent?.propertyId;
+      return id ? this.properties[id] || null : null;
     },
 
     get detailStaff() {
@@ -472,6 +538,10 @@ function calendarApp() {
       staffIds = null,
       status = "planned",
       priority = "normal",
+      propertyId = null,
+      description = "",
+      goal = "",
+      attachments = null,
     }) {
       const defaultStaff = {
         viewing: "roman",
@@ -500,6 +570,15 @@ function calendarApp() {
         done: done || status === "done",
         status: done ? "done" : status,
         priority,
+        propertyId,
+        description: description || (propertyId && propertyNotes[type]?.description)
+          || defaultNotes[type]?.description || "",
+        goal: goal || (propertyId && propertyNotes[type]?.goal)
+          || defaultNotes[type]?.goal || "",
+        // Mocked attachments are visual examples, not downloadable files.
+        attachments: attachments ? attachments.map((file) => ({ ...file }))
+          : propertyId ? propertyFiles.map((file) => ({ ...file }))
+          : [],
         staffIds: [...new Set(assigned)],
       });
     },
@@ -575,12 +654,24 @@ function calendarApp() {
                   ":" +
                   ["00", "15", "30", "45"][(index + day) % 4];
 
+            const featuredProperty = offset === 0 && (
+              (day === 16 && index === 0) ||
+              (day === 20 && index === 0) ||
+              (day === 22 && index === 1)
+            );
+            const propertyLabel = type === "viewing"
+              ? "Показ · Can Verboom 2"
+              : type === "docs"
+                ? "Документы · Can Verboom 2"
+                : "Встреча · Can Verboom 2";
+
             this.addEvent({
               date,
               type,
-              title: templates[type][(day + index) % 3] + related,
+              title: featuredProperty ? propertyLabel : templates[type][(day + index) % 3] + related,
               time,
-              related,
+              related: featuredProperty ? "Premià de Dalt · SC-01246" : related,
+              propertyId: featuredProperty ? "canVerboom2" : null,
               attention: [15, 16, 20].includes(day) && index === 0,
               status: ["planned", "progress", "waiting", "planned", "done"][(day + index) % 5],
               priority: ["normal", "normal", "low", "high", "urgent"][(day * 2 + index) % 5],
@@ -593,8 +684,8 @@ function calendarApp() {
         ["docs", "Отправить документы по Villa Marina", "", "Villa Marina · Виктория", true],
         ["reminder", "Уточнить статус ипотечного решения", "", "Клиент Андрей"],
         ["call", "Позвонить Марии Петровой", "09:30", "Квартира в Alicante"],
-        ["viewing", "Показ · Вилла Cabo Roig", "10:00", "Клиент София"],
-        ["meeting", "Встреча с собственником", "11:30", "Условия продажи"],
+        ["viewing", "Показ · Can Verboom 2", "10:00", "Premià de Dalt · клиент София"],
+        ["meeting", "Встреча · Can Verboom 2", "11:30", "Premià de Dalt · SC-01246"],
         ["docs", "Согласовать договор", "13:00", "Casa Blanca · Юрист"],
         ["call", "Обратный звонок · Даниэль", "14:15", "Апартаменты Azur"],
         ["viewing", "Повторный просмотр · Penthouse", "15:00", "Клиент Николай"],
@@ -609,6 +700,7 @@ function calendarApp() {
           attention,
           status: index === 1 ? "waiting" : index === 4 ? "progress" : "planned",
           priority: index === 0 ? "urgent" : index === 3 ? "high" : "normal",
+          propertyId: index === 3 || index === 4 ? "canVerboom2" : null,
           staffIds: index === 3
             ? ["roman", "alina"]
             : index === 5
