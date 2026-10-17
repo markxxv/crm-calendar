@@ -36,7 +36,6 @@ function calendarApp() {
     search: "",
     eventTypes,
     typeNames,
-    hours: Array.from({ length: 13 }, (_, index) => index + 8),
     events: [],
     nextId: 1,
     modalOpen: false,
@@ -125,6 +124,14 @@ function calendarApp() {
           outside: date.getMonth() !== month,
         };
       });
+    },
+
+    get hours() {
+      const occupied = this.timedToday.map((event) => Number(event.time.slice(0, 2)));
+      const earliest = Math.min(8, ...occupied);
+      const latest = Math.max(20, ...occupied);
+
+      return Array.from({ length: latest - earliest + 1 }, (_, index) => earliest + index);
     },
 
     get todayEvents() {
