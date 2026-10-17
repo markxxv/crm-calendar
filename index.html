@@ -469,10 +469,13 @@
                 </template>
 
                 <template x-for="event in untimedToday" :key="event.id">
-                  <div class="flex min-w-0 items-start gap-2.5 rounded-lg bg-white px-3 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.035)]">
+                  <div
+                    @click="openEvent(event.id)"
+                    class="flex min-w-0 cursor-pointer items-start gap-2.5 rounded-lg bg-white px-3 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.035)] transition-colors hover:bg-zinc-100"
+                  >
                     <button
                       type="button"
-                      @click="toggleComplete(event.id)"
+                      @click.stop="toggleComplete(event.id)"
                       :aria-label="event.done ? 'Возобновить задачу' : 'Завершить задачу'"
                       :aria-pressed="event.done"
                       :class="event.done && 'border-zinc-900 bg-zinc-900 text-white'"
