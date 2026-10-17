@@ -22,13 +22,13 @@
 
     <style>
       :root {
-        --header-height: 5rem;
-        --today-panel-width: 23rem;
-        --calendar-min-width: 44rem;
-        --day-min-height: 8.75rem;
-        --panel-min-height: 42rem;
-        --hour-label-width: 3.75rem;
-        --hour-min-height: 3.5rem;
+        --header-height: 3.5rem;
+        --today-panel-width: 20rem;
+        --drawer-width: 21rem;
+        --day-min-height: 6.75rem;
+        --day-min-height-mobile: 3.5rem;
+        --hour-label-width: 3rem;
+        --hour-min-height: 2.75rem;
         --event-dot-size: 0.375rem;
 
         --event-viewing: #60a5fa;
@@ -92,39 +92,30 @@
     <div class="min-h-screen">
       <!-- Global header -->
       <header
-        class="flex h-(--header-height) items-center justify-between gap-4 border-b border-zinc-200 px-4 sm:px-6 lg:px-7"
+        class="flex items-center justify-between gap-3 border-b border-zinc-100 px-3 py-2 sm:px-5"
       >
-        <div class="flex min-w-0 items-center gap-3">
-          <div
-            class="grid size-9 shrink-0 place-items-center rounded-lg bg-zinc-900 text-white"
-          >
-            <svg class="icon size-5" aria-hidden="true">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <div class="grid size-8 shrink-0 place-items-center rounded-lg bg-zinc-900 text-white">
+            <svg class="icon size-4" aria-hidden="true">
               <use href="#i-calendar"></use>
             </svg>
           </div>
-          <div class="min-w-0">
-            <p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase">
-              Backoffice / Команда
-            </p>
-            <p class="truncate text-sm font-semibold tracking-tight">
-              Календарь и задачи
-            </p>
-          </div>
+          <span class="truncate text-sm font-semibold tracking-tight">Календарь и задачи</span>
         </div>
 
         <div class="flex items-center gap-3">
           <button
             type="button"
             @click="openCreate()"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
+            class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-2.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
           >
             <svg class="icon size-4" aria-hidden="true">
               <use href="#i-plus"></use>
             </svg>
-            <span class="hidden sm:inline">Новое событие</span>
+            <span class="hidden sm:inline">Добавить событие</span>
           </button>
           <span
-            class="hidden size-9 place-items-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500 sm:grid"
+            class="hidden size-8 place-items-center rounded-full bg-zinc-100 text-[0.6875rem] font-semibold text-zinc-500 sm:grid"
             title="Агент"
           >
             АМ
@@ -132,14 +123,14 @@
         </div>
       </header>
 
-      <main class="grid min-w-0 lg:grid-cols-[minmax(0,1fr)_var(--today-panel-width)]">
+      <main class="grid min-w-0 xl:grid-cols-[minmax(0,1fr)_var(--today-panel-width)]">
         <!-- Monthly calendar -->
-        <section class="relative order-2 flex min-w-0 flex-col lg:order-1" aria-label="Календарь месяца">
-          <div class="px-4 pt-6 pb-5 sm:px-6 lg:px-7">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-              <div class="flex items-center gap-4">
+        <section class="relative order-2 flex min-w-0 flex-col xl:order-1" aria-label="Календарь месяца">
+          <div class="px-3 pt-3 pb-2 sm:px-5 sm:pt-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
                 <h1
-                  class="text-2xl font-semibold tracking-tight sm:text-[1.625rem]"
+                  class="text-xl font-semibold tracking-tight sm:text-[1.375rem]"
                   x-text="monthTitle"
                 ></h1>
 
@@ -148,7 +139,7 @@
                     type="button"
                     @click="changeMonth(-1)"
                     aria-label="Предыдущий месяц"
-                    class="grid size-8 place-items-center rounded-md border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    class="grid size-8 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100"
                   >
                     <svg class="icon size-4" aria-hidden="true">
                       <use href="#i-left"></use>
@@ -158,7 +149,7 @@
                     type="button"
                     @click="changeMonth(1)"
                     aria-label="Следующий месяц"
-                    class="grid size-8 place-items-center rounded-md border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    class="grid size-8 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100"
                   >
                     <svg class="icon size-4" aria-hidden="true">
                       <use href="#i-right"></use>
@@ -170,21 +161,21 @@
               <button
                 type="button"
                 @click="goToday()"
-                class="rounded-md border border-zinc-200 px-3 py-2 text-xs font-medium hover:bg-zinc-50"
+                class="rounded-lg bg-zinc-100 px-3 py-2 text-xs font-medium hover:bg-zinc-200/70"
               >
                 Сегодня
               </button>
             </div>
 
-            <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <div class="flex max-w-full items-center gap-1 overflow-x-auto pb-1">
+            <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex max-w-full items-center gap-0.5 overflow-x-auto pb-1">
                 <template x-for="type in eventTypes" :key="type.id">
                   <button
                     type="button"
                     @click="filter = type.id"
                     :aria-pressed="filter === type.id"
-                    :class="filter === type.id ? 'bg-zinc-100 font-semibold text-zinc-900' : 'text-zinc-500 hover:bg-zinc-50'"
-                    class="inline-flex shrink-0 items-center gap-2 rounded-md px-2.5 py-2 text-xs transition-colors"
+                    :class="filter === type.id ? 'bg-zinc-900 font-semibold text-white' : 'text-zinc-500 hover:bg-zinc-100'"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[0.6875rem] transition-colors"
                   >
                     <span
                       x-show="type.id !== 'all'"
@@ -197,7 +188,7 @@
                 </template>
               </div>
 
-              <label class="relative block min-w-40 flex-1 sm:max-w-56">
+              <label class="relative block min-w-36 flex-1 sm:max-w-56">
                 <svg
                   class="icon pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
                   aria-hidden="true"
@@ -209,28 +200,28 @@
                   x-model.debounce.150ms="search"
                   placeholder="Найти задачу, объект…"
                   aria-label="Поиск событий"
-                  class="h-9 w-full rounded-md border border-zinc-200 bg-white pr-3 pl-9 text-xs outline-none placeholder:text-zinc-400 focus:border-zinc-400"
+                  class="h-8 w-full rounded-lg bg-zinc-50 pr-3 pl-9 text-xs outline-none ring-1 ring-transparent placeholder:text-zinc-400 focus:bg-white focus:ring-zinc-200"
                 />
               </label>
             </div>
           </div>
 
-          <div class="min-w-0 overflow-x-auto">
-            <div class="min-w-(--calendar-min-width)">
-              <div class="grid grid-cols-7 border-y border-zinc-200">
+          <div class="min-w-0">
+            <div class="w-full min-w-0">
+              <div class="grid grid-cols-7 border-b border-zinc-100 bg-zinc-50/60">
                 <template
                   x-for="(weekday, index) in ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']"
                   :key="weekday"
                 >
                   <div
-                    class="px-3 py-3 text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase"
+                    class="px-1.5 py-1.5 text-center text-[0.5625rem] font-semibold tracking-wide text-zinc-400 uppercase sm:px-3"
                     :class="index >= 5 && 'text-zinc-300'"
                     x-text="weekday"
                   ></div>
                 </template>
               </div>
 
-              <div class="grid grid-cols-7 auto-rows-[minmax(var(--day-min-height),1fr)]">
+              <div class="grid grid-cols-7 auto-rows-[minmax(var(--day-min-height-mobile),1fr)] sm:auto-rows-[minmax(var(--day-min-height),1fr)]">
                 <template x-for="cell in calendarDays" :key="cell.key">
                   <button
                     type="button"
@@ -248,9 +239,9 @@
                       'bg-zinc-50': cell.key === today,
                       'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
                     }"
-                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-200 px-3 pt-3 pb-7 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600"
+                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-100/80 px-1.5 pt-1.5 pb-2 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600 sm:px-2.5 sm:pt-2.5 sm:pb-5"
                   >
-                    <div class="mb-2 flex w-full items-center justify-between gap-1">
+                    <div class="mb-1.5 flex w-full items-center justify-between gap-1">
                       <span
                         :class="{
                           'text-zinc-300': cell.outside,
@@ -258,17 +249,17 @@
                           'text-zinc-600': !cell.outside && !cell.weekend && cell.key !== today,
                           'bg-zinc-900 text-white': cell.key === today,
                         }"
-                        class="grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium"
+                        class="grid size-6 shrink-0 place-items-center rounded-full text-[0.6875rem] font-semibold"
                         x-text="cell.day"
                       ></span>
                       <span
                         class="text-[0.625rem] font-semibold text-zinc-400"
-                        x-show="cellEventCount(cell) > 3"
+                        x-show="cellEventCount(cell) > 0"
                         x-text="cellEventCount(cell)"
                       ></span>
                     </div>
 
-                    <div class="flex min-w-0 w-full flex-col gap-2">
+                    <div class="hidden min-w-0 w-full flex-col gap-1.5 sm:flex">
                       <template
                         x-for="event in cellEvents(cell).slice(0, 2)"
                         :key="event.id"
@@ -294,15 +285,25 @@
                       </template>
                     </div>
 
+                    <div class="mt-1 flex items-center gap-1 sm:hidden">
+                      <template x-for="event in cellEvents(cell).slice(0, 3)" :key="event.id">
+                        <span
+                          class="size-(--event-dot-size) rounded-full"
+                          :style="'background-color: var(--event-' + event.type + ')'"
+                          aria-hidden="true"
+                        ></span>
+                      </template>
+                    </div>
+
                     <span
                       x-show="cellEventCount(cell) > 2"
-                      class="mt-2 pl-3 text-[0.625rem] font-semibold text-zinc-500"
+                      class="mt-1 hidden pl-3 text-[0.625rem] font-medium text-zinc-400 sm:block"
                       x-text="'+ ещё ' + (cellEventCount(cell) - 2)"
                     ></span>
 
                     <div
                       x-show="cellEventCount(cell) > 0"
-                      class="absolute right-3 bottom-3 left-3 h-0.5 overflow-hidden rounded-full bg-zinc-100"
+                      class="absolute right-2 bottom-2 left-2 hidden h-0.5 overflow-hidden rounded-full bg-zinc-100 sm:block"
                     >
                       <div
                         class="h-full w-(--load) rounded-full bg-zinc-400"
