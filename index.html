@@ -750,7 +750,7 @@
           class="absolute inset-y-0 right-0 flex h-dvh w-full max-w-(--event-detail-width) flex-col bg-white shadow-[-12px_0_40px_rgb(0_0_0_/_0.07)]"
         >
           <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
-            <div class="flex items-center justify-between gap-3">
+            <div class="relative flex items-center justify-between gap-3">
               <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[0.6875rem] text-zinc-400">
                 <span
                   class="size-(--event-dot-size) shrink-0 rounded-full"
@@ -759,7 +759,7 @@
                 ></span>
                 <span class="truncate" x-text="typeNames[detailEvent.type]"></span>
                 <span class="text-zinc-300" aria-hidden="true">·</span>
-                <div class="relative min-w-0">
+                <div class="min-w-0">
                   <button
                     type="button"
                     @click="toggleDetailMenu('datePickerOpen')"
@@ -782,7 +782,7 @@
                     x-transition.opacity.duration.100ms
                     @click.outside="datePickerOpen = false"
                     @keydown.escape.stop="datePickerOpen = false"
-                    class="absolute top-full right-0 z-40 mt-2 w-(--date-popover-width) rounded-xl bg-white p-3 shadow-xl ring-1 ring-zinc-200"
+                    class="absolute top-full left-0 z-40 mt-2 w-(--date-popover-width) max-w-full rounded-xl bg-white p-3 shadow-xl ring-1 ring-zinc-200"
                   >
                     <label class="block text-[0.6875rem] font-medium text-zinc-500" for="rescheduleDate">
                       Перенести на
