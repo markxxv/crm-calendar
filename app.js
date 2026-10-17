@@ -28,6 +28,21 @@ function calendarApp() {
     reminder: "Напоминание",
   };
 
+  const statuses = [
+    { id: "planned", label: "Запланировано", icon: "calendar" },
+    { id: "progress", label: "В работе", icon: "play" },
+    { id: "waiting", label: "Ожидание", icon: "clock" },
+    { id: "done", label: "Выполнено", icon: "check" },
+    { id: "cancelled", label: "Отменено", icon: "x" },
+  ];
+
+  const priorities = [
+    { id: "low", label: "Низкий", icon: "minus" },
+    { id: "normal", label: "Обычный", icon: "flag" },
+    { id: "high", label: "Высокий", icon: "flag" },
+    { id: "urgent", label: "Срочный", icon: "alert" },
+  ];
+
   // Only the three confirmed agency team members are used in the prototype.
   const staff = [
     {
@@ -67,11 +82,16 @@ function calendarApp() {
     search: "",
     eventTypes,
     typeNames,
+    statuses,
+    priorities,
     staff,
     events: [],
     nextId: 1,
     detailEventId: null,
     employeePickerOpen: false,
+    statusPickerOpen: false,
+    priorityPickerOpen: false,
+    activeStaffPopover: null,
     modalOpen: false,
     toastMessage: "",
     toastHandle: null,
@@ -184,6 +204,16 @@ function calendarApp() {
       return this.staff.filter((person) => !this.detailEvent.staffIds.includes(person.id));
     },
 
+    optionFor(options, id) {
+      return options.find((option) => option.id === id) || options[0];
+    },
+
+    optionColor(group, id) {
+      const valid = group === "status" ? this.statuses : this.priorities;
+      const selected = this.optionFor(valid, id);
+      return `var(--${group}-${selected.id})`;
+    },
+
     eventsFor(date) {
       return this.visibleEvents
         .filter((event) => event.date === date)
@@ -255,12 +285,40 @@ function calendarApp() {
       if (!this.events.some((event) => event.id === id)) return;
 
       this.detailEventId = id;
+      this.closeDetailMenus();
+    },
+
+    closeDetailMenus() {
       this.employeePickerOpen = false;
+      this.statusPickerOpen = false;
+      this.priorityPickerOpen = false;
+      this.activeStaffPopover = null;
     },
 
     closeEvent() {
       this.detailEventId = null;
-      this.employeePickerOpen = false;
+      this.closeDetailMenus();
+    },
+
+    toggleDetailMenu(menu) {
+      const isOpen = Boolean(this[menu]);
+      this.closeDetailMenus();
+      this[menu] = !isOpen;
+    },
+
+    setStatus(id) {
+      const event = this.detailEvent;
+      if (!event || !this.statuses.some((status) => status.id === id)) return;
+      event.status = id;
+      event.done = id === "done";
+      this.statusPickerOpen = false;
+    },
+
+    setPriority(id) {
+      const event = this.detailEvent;
+      if (!event || !this.priorities.some((priority) => priority.id === id)) return;
+      event.priority = id;
+      this.priorityPickerOpen = false;
     },
 
     assignStaff(staffId) {
@@ -309,7 +367,9 @@ function calendarApp() {
 
     toggleComplete(id) {
       const event = this.events.find((item) => item.id === id);
-      if (event) event.done = !event.done;
+      if (!event) return;
+      event.done = !event.done;
+      event.status = event.done ? "done" : "planned";
     },
 
     addEvent({
@@ -321,6 +381,8 @@ function calendarApp() {
       attention = false,
       done = false,
       staffIds = null,
+      status = "planned",
+      priority = "normal",
     }) {
       const defaultStaff = {
         viewing: "roman",
@@ -346,7 +408,9 @@ function calendarApp() {
         time,
         related,
         attention,
-        done,
+        done: done || status === "done",
+        status: done ? "done" : status,
+        priority,
         staffIds: [...new Set(assigned)],
       });
     },
@@ -429,6 +493,8 @@ function calendarApp() {
               time,
               related,
               attention: [15, 16, 20].includes(day) && index === 0,
+              status: ["planned", "progress", "waiting", "planned", "done"][(day + index) % 5],
+              priority: ["normal", "normal", "low", "high", "urgent"][(day * 2 + index) % 5],
             });
           }
         }
@@ -452,6 +518,8 @@ function calendarApp() {
           time,
           related,
           attention,
+          status: index === 1 ? "waiting" : index === 4 ? "progress" : "planned",
+          priority: index === 0 ? "urgent" : index === 3 ? "high" : "normal",
           staffIds: index === 3
             ? ["roman", "alina"]
             : index === 5
