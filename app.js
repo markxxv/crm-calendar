@@ -162,6 +162,8 @@ function calendarApp() {
     events: [],
     nextId: 1,
     detailEventId: null,
+    datePickerOpen: false,
+    deadlinePickerOpen: false,
     employeePickerOpen: false,
     statusPickerOpen: false,
     priorityPickerOpen: false,
@@ -367,6 +369,29 @@ function calendarApp() {
       );
     },
 
+    formatShortDate(date) {
+      if (!date) return "";
+      return new Intl.DateTimeFormat("ru-RU", {
+        day: "numeric",
+        month: "short",
+      }).format(fromKey(date));
+    },
+
+    relativeDate(date, days) {
+      return toKey(addDays(fromKey(date), days));
+    },
+
+    isOverdue(event) {
+      return Boolean(event.deadline && event.deadline < this.today
+        && !event.done && event.status !== "cancelled");
+    },
+
+    isValidDate(value) {
+      if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+      const date = fromKey(value);
+      return !Number.isNaN(date.getTime()) && toKey(date) === value;
+    },
+
     labelFor(event) {
       return event.related || typeNames[event.type];
     },
@@ -443,6 +468,8 @@ function calendarApp() {
     },
 
     closeDetailMenus() {
+      this.datePickerOpen = false;
+      this.deadlinePickerOpen = false;
       this.employeePickerOpen = false;
       this.statusPickerOpen = false;
       this.priorityPickerOpen = false;
@@ -458,6 +485,36 @@ function calendarApp() {
       const isOpen = Boolean(this[menu]);
       this.closeDetailMenus();
       this[menu] = !isOpen;
+    },
+
+    rescheduleEvent(date) {
+      const event = this.detailEvent;
+      if (!event || !this.isValidDate(date)) return;
+
+      event.date = date;
+      const moved = fromKey(date);
+      this.currentMonth = new Date(moved.getFullYear(), moved.getMonth(), 1);
+      this.currentWeek = startOfWeek(moved);
+      if (this.selectedDate !== null) this.selectedDate = date;
+      this.datePickerOpen = false;
+    },
+
+    setDeadline(date) {
+      const event = this.detailEvent;
+      if (!event || (date && !this.isValidDate(date))) return;
+
+      event.deadline = date;
+      if (!date) {
+        event.deadlineTime = "";
+        this.deadlinePickerOpen = false;
+      }
+    },
+
+    setDeadlineTime(time) {
+      const event = this.detailEvent;
+      if (!event || !event.deadline) return;
+      if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return;
+      event.deadlineTime = time;
     },
 
     setStatus(id) {
@@ -542,6 +599,8 @@ function calendarApp() {
       description = "",
       goal = "",
       attachments = null,
+      deadline = "",
+      deadlineTime = "",
     }) {
       const defaultStaff = {
         viewing: "roman",
@@ -570,6 +629,8 @@ function calendarApp() {
         done: done || status === "done",
         status: done ? "done" : status,
         priority,
+        deadline,
+        deadlineTime,
         propertyId,
         description: description || (propertyId && propertyNotes[type]?.description)
           || defaultNotes[type]?.description || "",
@@ -675,6 +736,8 @@ function calendarApp() {
               attention: [15, 16, 20].includes(day) && index === 0,
               status: ["planned", "progress", "waiting", "planned", "done"][(day + index) % 5],
               priority: ["normal", "normal", "low", "high", "urgent"][(day * 2 + index) % 5],
+              deadline: index === 0 && day % 3 === 0 ? toKey(addDays(calendarDate, 2)) : "",
+              deadlineTime: index === 0 && day % 3 === 0 ? "17:00" : "",
             });
           }
         }
@@ -701,6 +764,8 @@ function calendarApp() {
           status: index === 1 ? "waiting" : index === 4 ? "progress" : "planned",
           priority: index === 0 ? "urgent" : index === 3 ? "high" : "normal",
           propertyId: index === 3 || index === 4 ? "canVerboom2" : null,
+          deadline: index === 0 || index === 3 ? toKey(addDays(anchor, 2)) : "",
+          deadlineTime: index === 0 ? "17:00" : "",
           staffIds: index === 3
             ? ["roman", "alina"]
             : index === 5
