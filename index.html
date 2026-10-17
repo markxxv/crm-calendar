@@ -25,7 +25,21 @@
         --header-height: 3rem;
         --today-panel-width: 20rem;
         --drawer-width: 21rem;
-        --event-detail-width: 32rem;
+        --event-detail-width: 27rem;
+        --dropdown-min-width: 11.5rem;
+        --staff-popover-width: 14rem;
+        --staff-picker-width: 15rem;
+
+        --status-planned: var(--color-zinc-400);
+        --status-progress: var(--color-blue-500);
+        --status-waiting: var(--color-amber-500);
+        --status-done: var(--color-green-500);
+        --status-cancelled: var(--color-rose-500);
+
+        --priority-low: var(--color-zinc-400);
+        --priority-normal: var(--color-blue-400);
+        --priority-high: var(--color-amber-500);
+        --priority-urgent: var(--color-rose-500);
         --day-min-height: 6.75rem;
         --day-min-height-mobile: 3.5rem;
         --hour-label-width: 3rem;
@@ -86,6 +100,25 @@
         </symbol>
         <symbol id="i-check" viewBox="0 0 24 24">
           <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="i-down" viewBox="0 0 24 24">
+          <path d="m6 9 6 6 6-6" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="m8 5 11 7-11 7z" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="i-flag" viewBox="0 0 24 24">
+          <path d="M5 21V4m0 1c4-3 7 3 14 0v11c-7 3-10-3-14 0" />
+        </symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24">
+          <path d="M5 12h14" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+          <path d="M12 3 2 20h20L12 3ZM12 9v5m0 3v.01" />
         </symbol>
       </defs>
     </svg>
@@ -584,197 +617,296 @@
       </main>
     </div>
 
-    <!-- Event details and responsibility management -->
+    <!-- Full-height event drawer -->
     <div
       x-show="detailEventId !== null"
       x-cloak
-      x-transition.opacity.duration.150ms
-      @click.self="closeEvent()"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-zinc-950/40 sm:items-center sm:p-4"
+      class="fixed inset-0 z-50"
+      aria-label="Подробности события"
     >
+      <div
+        x-show="detailEventId !== null"
+        x-transition.opacity.duration.150ms
+        @click="closeEvent()"
+        class="absolute inset-0 bg-zinc-950/25"
+        aria-hidden="true"
+      ></div>
+
       <template x-if="detailEvent">
-        <section
+        <aside
           role="dialog"
           aria-modal="true"
           aria-labelledby="eventDetailHeading"
-          class="max-h-[94dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl sm:max-w-(--event-detail-width) sm:rounded-2xl sm:p-5"
+          class="absolute inset-y-0 right-0 flex h-dvh w-full max-w-(--event-detail-width) flex-col bg-white shadow-[-12px_0_40px_rgb(0_0_0_/_0.07)]"
         >
-          <div class="flex items-center justify-between gap-3">
-            <div class="flex min-w-0 items-center gap-2 text-[0.6875rem] text-zinc-500">
-              <span
-                class="size-(--event-dot-size) shrink-0 rounded-full"
-                :style="'background-color: var(--event-' + detailEvent.type + ')'"
-                aria-hidden="true"
-              ></span>
-              <span class="truncate" x-text="typeNames[detailEvent.type]"></span>
-              <span class="text-zinc-300">·</span>
-              <span class="shrink-0" x-text="formatDate(detailEvent.date)"></span>
-            </div>
-            <button
-              type="button"
-              @click="closeEvent()"
-              aria-label="Закрыть подробности"
-              class="grid size-8 shrink-0 place-items-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900"
-            >
-              <svg class="icon size-4" aria-hidden="true">
-                <use href="#i-x"></use>
-              </svg>
-            </button>
-          </div>
-
-          <h2
-            id="eventDetailHeading"
-            class="mt-3 text-xl font-semibold leading-snug tracking-tight text-zinc-950"
-            x-text="detailEvent.title"
-          ></h2>
-
-          <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-            <span
-              x-show="detailEvent.time"
-              class="rounded-md bg-zinc-100 px-2 py-1 font-semibold tabular-nums text-zinc-900"
-              x-text="detailEvent.time"
-            ></span>
-            <span x-show="detailEvent.related" x-text="detailEvent.related"></span>
-            <span
-              x-show="detailEvent.attention && !detailEvent.done"
-              class="text-amber-600"
-            >Требует внимания</span>
-            <span x-show="detailEvent.done" class="text-green-600">Выполнено</span>
-          </div>
-
-          <div class="mt-5 rounded-xl bg-zinc-50 p-3 sm:p-4">
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
             <div class="flex items-center justify-between gap-3">
-              <div>
-                <h3 class="text-xs font-semibold text-zinc-900">Ответственные</h3>
-                <p
-                  class="mt-0.5 text-[0.6875rem] text-zinc-400"
-                  x-text="detailStaff.length === 0 ? 'Не назначены' : detailStaff.length + ' назначено'"
-                ></p>
+              <div class="flex min-w-0 items-center gap-2 text-[0.6875rem] text-zinc-400">
+                <span
+                  class="size-(--event-dot-size) shrink-0 rounded-full"
+                  :style="'background-color: var(--event-' + detailEvent.type + ')'"
+                  aria-hidden="true"
+                ></span>
+                <span class="truncate" x-text="typeNames[detailEvent.type]"></span>
+                <span class="text-zinc-300" aria-hidden="true">·</span>
+                <span class="shrink-0" x-text="formatDate(detailEvent.date)"></span>
               </div>
-              <div class="flex shrink-0 items-center gap-2">
-                <div class="flex -space-x-2" aria-label="Назначенные сотрудники">
-                  <template x-for="person in detailStaff" :key="person.id">
-                    <img
-                      :src="person.photo"
-                      :alt="person.name"
-                      :title="person.name"
-                      class="size-8 rounded-full border-2 border-zinc-50 bg-zinc-200 object-cover"
-                      loading="lazy"
-                    />
+              <button
+                type="button"
+                @click="closeEvent()"
+                aria-label="Закрыть подробности"
+                class="grid size-8 shrink-0 place-items-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              >
+                <svg class="icon size-4" aria-hidden="true">
+                  <use href="#i-x"></use>
+                </svg>
+              </button>
+            </div>
+
+            <h2
+              id="eventDetailHeading"
+              class="mt-4 text-xl font-semibold leading-snug tracking-tight text-zinc-950"
+              x-text="detailEvent.title"
+            ></h2>
+
+            <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
+              <span
+                x-show="detailEvent.time"
+                class="font-semibold tabular-nums text-zinc-900"
+                x-text="detailEvent.time"
+              ></span>
+              <span
+                x-show="detailEvent.time && detailEvent.related"
+                class="text-zinc-300"
+                aria-hidden="true"
+              >·</span>
+              <span x-show="detailEvent.related" x-text="detailEvent.related"></span>
+            </div>
+
+            <!-- Two compact CRM selectors -->
+            <div class="mt-6 grid grid-cols-2 gap-3">
+              <div class="relative min-w-0">
+                <label class="mb-1.5 block text-[0.6875rem] font-medium text-zinc-400">
+                  Статус
+                </label>
+                <button
+                  type="button"
+                  @click="toggleDetailMenu('statusPickerOpen')"
+                  :aria-expanded="statusPickerOpen"
+                  aria-label="Выбрать статус события"
+                  class="flex w-full items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-500"
+                >
+                  <span class="flex min-w-0 items-center gap-2">
+                    <svg
+                      class="icon size-4 shrink-0"
+                      :style="'color: ' + optionColor('status', detailEvent.status)"
+                      aria-hidden="true"
+                    >
+                      <use :href="'#i-' + optionFor(statuses, detailEvent.status).icon"></use>
+                    </svg>
+                    <span class="truncate" x-text="optionFor(statuses, detailEvent.status).label"></span>
+                  </span>
+                  <svg class="icon size-3 shrink-0 text-zinc-400" aria-hidden="true">
+                    <use href="#i-down"></use>
+                  </svg>
+                </button>
+
+                <div
+                  x-show="statusPickerOpen"
+                  x-cloak
+                  x-transition.opacity.duration.100ms
+                  @click.outside="statusPickerOpen = false"
+                  class="absolute top-full left-0 z-30 mt-1.5 w-full min-w-(--dropdown-min-width) rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-zinc-100"
+                  role="group"
+                  aria-label="Варианты статуса"
+                >
+                  <template x-for="option in statuses" :key="option.id">
+                    <button
+                      type="button"
+                      @click="setStatus(option.id)"
+                      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50"
+                      :class="detailEvent.status === option.id && 'bg-zinc-50 font-semibold'"
+                    >
+                      <svg
+                        class="icon size-4 shrink-0"
+                        :style="'color: ' + optionColor('status', option.id)"
+                        aria-hidden="true"
+                      >
+                        <use :href="'#i-' + option.icon"></use>
+                      </svg>
+                      <span class="flex-1" x-text="option.label"></span>
+                      <svg x-show="detailEvent.status === option.id" class="icon size-3.5 text-zinc-800" aria-hidden="true">
+                        <use href="#i-check"></use>
+                      </svg>
+                    </button>
                   </template>
                 </div>
+              </div>
+
+              <div class="relative min-w-0">
+                <label class="mb-1.5 block text-[0.6875rem] font-medium text-zinc-400">
+                  Приоритет
+                </label>
                 <button
                   type="button"
-                  @click="employeePickerOpen = !employeePickerOpen"
-                  :disabled="unassignedStaff.length === 0"
-                  :aria-expanded="employeePickerOpen"
-                  aria-label="Добавить ответственного сотрудника"
-                  class="grid size-8 place-items-center rounded-full bg-white text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-30"
+                  @click="toggleDetailMenu('priorityPickerOpen')"
+                  :aria-expanded="priorityPickerOpen"
+                  aria-label="Выбрать приоритет события"
+                  class="flex w-full items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-zinc-500"
                 >
-                  <svg class="icon size-4" aria-hidden="true">
-                    <use href="#i-plus"></use>
+                  <span class="flex min-w-0 items-center gap-2">
+                    <svg
+                      class="icon size-4 shrink-0"
+                      :style="'color: ' + optionColor('priority', detailEvent.priority)"
+                      aria-hidden="true"
+                    >
+                      <use :href="'#i-' + optionFor(priorities, detailEvent.priority).icon"></use>
+                    </svg>
+                    <span class="truncate" x-text="optionFor(priorities, detailEvent.priority).label"></span>
+                  </span>
+                  <svg class="icon size-3 shrink-0 text-zinc-400" aria-hidden="true">
+                    <use href="#i-down"></use>
                   </svg>
                 </button>
+
+                <div
+                  x-show="priorityPickerOpen"
+                  x-cloak
+                  x-transition.opacity.duration.100ms
+                  @click.outside="priorityPickerOpen = false"
+                  class="absolute top-full right-0 z-30 mt-1.5 w-full min-w-(--dropdown-min-width) rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-zinc-100"
+                  role="group"
+                  aria-label="Варианты приоритета"
+                >
+                  <template x-for="option in priorities" :key="option.id">
+                    <button
+                      type="button"
+                      @click="setPriority(option.id)"
+                      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50"
+                      :class="detailEvent.priority === option.id && 'bg-zinc-50 font-semibold'"
+                    >
+                      <svg
+                        class="icon size-4 shrink-0"
+                        :style="'color: ' + optionColor('priority', option.id)"
+                        aria-hidden="true"
+                      >
+                        <use :href="'#i-' + option.icon"></use>
+                      </svg>
+                      <span class="flex-1" x-text="option.label"></span>
+                      <svg x-show="detailEvent.priority === option.id" class="icon size-3.5 text-zinc-800" aria-hidden="true">
+                        <use href="#i-check"></use>
+                      </svg>
+                    </button>
+                  </template>
+                </div>
               </div>
             </div>
 
-            <div class="mt-3 space-y-1.5">
-              <template x-for="person in detailStaff" :key="person.id">
-                <div class="flex items-start gap-3 rounded-lg bg-white p-2.5">
-                  <img
-                    :src="person.photo"
-                    :alt="person.name"
-                    class="size-10 shrink-0 rounded-full bg-zinc-100 object-cover"
-                    loading="lazy"
-                  />
-                  <div class="min-w-0 flex-1">
-                    <p class="text-xs font-semibold text-zinc-900" x-text="person.name"></p>
-                    <p class="mt-0.5 text-[0.6875rem] leading-snug text-zinc-400" x-text="person.role"></p>
-                    <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.6875rem]">
-                      <a
-                        :href="'mailto:' + person.email"
-                        class="text-zinc-600 underline-offset-2 hover:text-zinc-950 hover:underline"
-                        x-text="person.email"
-                      ></a>
-                      <a
-                        :href="person.phoneHref"
-                        class="text-zinc-600 underline-offset-2 hover:text-zinc-950 hover:underline"
-                        x-text="person.phone"
-                      ></a>
+            <!-- Only avatars are visible; contact details appear on hover, focus or tap. -->
+            <div class="mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+              <span class="text-xs font-medium text-zinc-500">Ответственные</span>
+              <div class="flex items-center gap-2">
+                <div class="flex items-center -space-x-2">
+                  <template x-for="person in detailStaff" :key="person.id">
+                    <div
+                      class="relative"
+                      @mouseenter="activeStaffPopover = person.id"
+                      @mouseleave="activeStaffPopover = null"
+                      @click.outside="activeStaffPopover = null"
+                    >
+                      <button
+                        type="button"
+                        @click.stop="activeStaffPopover = activeStaffPopover === person.id ? null : person.id"
+                        :aria-label="'Контакты: ' + person.name"
+                        :aria-expanded="activeStaffPopover === person.id"
+                        class="relative grid size-9 place-items-center rounded-full bg-zinc-100 ring-2 ring-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
+                      >
+                        <img
+                          :src="person.photo"
+                          :alt="person.name"
+                          class="size-9 rounded-full object-cover"
+                          loading="lazy"
+                        />
+                      </button>
+                      <div
+                        x-show="activeStaffPopover === person.id"
+                        x-cloak
+                        x-transition.opacity.duration.100ms
+                        class="absolute top-full right-0 z-40 w-(--staff-popover-width) pt-2"
+                      >
+                        <div class="rounded-xl bg-white p-3 shadow-xl ring-1 ring-zinc-200">
+                          <p class="text-xs font-semibold text-zinc-900" x-text="person.name"></p>
+                          <p class="mt-0.5 text-[0.6875rem] leading-snug text-zinc-400" x-text="person.role"></p>
+                          <a
+                            :href="'mailto:' + person.email"
+                            @click.stop
+                            class="mt-2 block truncate text-[0.6875rem] text-zinc-600 hover:text-zinc-950"
+                            x-text="person.email"
+                          ></a>
+                          <a
+                            :href="person.phoneHref"
+                            @click.stop
+                            class="mt-1 block text-[0.6875rem] text-zinc-600 hover:text-zinc-950"
+                            x-text="person.phone"
+                          ></a>
+                          <button
+                            type="button"
+                            @click.stop="removeStaff(person.id); activeStaffPopover = null"
+                            class="mt-2 text-[0.6875rem] text-zinc-400 hover:text-rose-500"
+                          >
+                            Снять назначение
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </template>
+                </div>
+
+                <div class="relative">
                   <button
                     type="button"
-                    @click="removeStaff(person.id)"
-                    :aria-label="'Снять назначение: ' + person.name"
-                    :title="'Убрать ' + person.name"
-                    class="grid size-6 shrink-0 place-items-center rounded-md text-zinc-300 hover:bg-zinc-100 hover:text-zinc-700"
+                    @click="toggleDetailMenu('employeePickerOpen')"
+                    :disabled="unassignedStaff.length === 0"
+                    :aria-expanded="employeePickerOpen"
+                    aria-label="Добавить ответственного"
+                    class="grid size-8 place-items-center rounded-full bg-zinc-100 text-zinc-700 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    <svg class="icon size-3.5" aria-hidden="true">
-                      <use href="#i-x"></use>
+                    <svg class="icon size-4" aria-hidden="true">
+                      <use href="#i-plus"></use>
                     </svg>
                   </button>
+
+                  <div
+                    x-show="employeePickerOpen"
+                    x-cloak
+                    x-transition.opacity.duration.100ms
+                    @click.outside="employeePickerOpen = false"
+                    class="absolute top-full right-0 z-30 mt-2 w-(--staff-picker-width) rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-zinc-200"
+                  >
+                    <template x-for="person in unassignedStaff" :key="person.id">
+                      <button
+                        type="button"
+                        @click="assignStaff(person.id)"
+                        class="flex w-full items-center gap-2.5 rounded-lg p-2 text-left hover:bg-zinc-50"
+                      >
+                        <img
+                          :src="person.photo"
+                          :alt="person.name"
+                          class="size-8 shrink-0 rounded-full bg-zinc-100 object-cover"
+                          loading="lazy"
+                        />
+                        <span class="min-w-0">
+                          <span class="block truncate text-xs font-medium text-zinc-800" x-text="person.name"></span>
+                          <span class="block truncate text-[0.6875rem] text-zinc-400" x-text="person.role"></span>
+                        </span>
+                      </button>
+                    </template>
+                  </div>
                 </div>
-              </template>
-              <p x-show="detailStaff.length === 0" class="py-3 text-center text-xs text-zinc-400">
-                Добавьте сотрудника кнопкой +
-              </p>
-            </div>
-
-            <div
-              x-show="employeePickerOpen"
-              x-cloak
-              x-transition.opacity.duration.100ms
-              @click.outside="employeePickerOpen = false"
-              class="mt-2 overflow-hidden rounded-lg bg-white p-1 shadow-sm ring-1 ring-zinc-200"
-            >
-              <p class="px-2 py-1.5 text-[0.625rem] font-semibold text-zinc-400">
-                Назначить сотрудника
-              </p>
-              <template x-for="person in unassignedStaff" :key="person.id">
-                <button
-                  type="button"
-                  @click="assignStaff(person.id)"
-                  class="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left hover:bg-zinc-50"
-                >
-                  <img :src="person.photo" :alt="person.name" class="size-8 rounded-full bg-zinc-100 object-cover" loading="lazy" />
-                  <span class="min-w-0">
-                    <span class="block text-xs font-medium text-zinc-800" x-text="person.name"></span>
-                    <span class="block truncate text-[0.6875rem] text-zinc-400" x-text="person.role"></span>
-                  </span>
-                  <svg class="icon ml-auto size-3.5 shrink-0 text-zinc-400" aria-hidden="true">
-                    <use href="#i-plus"></use>
-                  </svg>
-                </button>
-              </template>
+              </div>
             </div>
           </div>
-
-          <div class="mt-4 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              @click="toggleComplete(detailEvent.id)"
-              class="inline-flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-950"
-            >
-              <span
-                class="grid size-4 place-items-center rounded border border-zinc-300"
-                :class="detailEvent.done && 'border-zinc-900 bg-zinc-900 text-white'"
-              >
-                <svg x-show="detailEvent.done" class="icon size-3" aria-hidden="true">
-                  <use href="#i-check"></use>
-                </svg>
-              </span>
-              <span x-text="detailEvent.done ? 'Возобновить задачу' : 'Отметить выполненным'"></span>
-            </button>
-            <button
-              type="button"
-              @click="closeEvent()"
-              class="rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-700"
-            >
-              Готово
-            </button>
-          </div>
-        </section>
+        </aside>
       </template>
     </div>
 
