@@ -341,10 +341,11 @@ function calendarApp() {
         .sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
     },
 
-    // Adjacent-month and weekend cells are deliberately summary-free.
-    // Real events stay in the data and remain accessible in the day drawer.
+    // Adjacent-month dates have no previews. Explicitly scheduled weekend
+    // events remain visible; only the prefilled weekend demo is hidden.
     cellEvents(cell) {
-      return cell.outside || cell.weekend ? [] : this.eventsFor(cell.key);
+      if (cell.outside) return [];
+      return this.eventsFor(cell.key).filter((event) => !event.hiddenWeekendDemo);
     },
 
     cellEventCount(cell) {
@@ -352,7 +353,7 @@ function calendarApp() {
     },
 
     weekDayEvents(day) {
-      return day.weekend ? [] : this.eventsFor(day.key);
+      return this.eventsFor(day.key).filter((event) => !event.hiddenWeekendDemo);
     },
 
     eventsAtHour(hour) {
@@ -492,6 +493,7 @@ function calendarApp() {
       if (!event || !this.isValidDate(date)) return;
 
       event.date = date;
+      event.hiddenWeekendDemo = false;
       const moved = fromKey(date);
       this.currentMonth = new Date(moved.getFullYear(), moved.getMonth(), 1);
       this.currentWeek = startOfWeek(moved);
@@ -601,6 +603,7 @@ function calendarApp() {
       attachments = null,
       deadline = "",
       deadlineTime = "",
+      hiddenWeekendDemo = false,
     }) {
       const defaultStaff = {
         viewing: "roman",
@@ -631,6 +634,7 @@ function calendarApp() {
         priority,
         deadline,
         deadlineTime,
+        hiddenWeekendDemo,
         propertyId,
         description: description || (propertyId && propertyNotes[type]?.description)
           || defaultNotes[type]?.description || "",
@@ -766,6 +770,7 @@ function calendarApp() {
           propertyId: index === 3 || index === 4 ? "canVerboom2" : null,
           deadline: index === 0 || index === 3 ? toKey(addDays(anchor, 2)) : "",
           deadlineTime: index === 0 ? "17:00" : "",
+          hiddenWeekendDemo: [0, 6].includes(anchor.getDay()),
           staffIds: index === 3
             ? ["roman", "alina"]
             : index === 5
