@@ -22,7 +22,7 @@
 
     <style>
       :root {
-        --header-height: 3.5rem;
+        --header-height: 3rem;
         --today-panel-width: 20rem;
         --drawer-width: 21rem;
         --day-min-height: 6.75rem;
@@ -239,9 +239,9 @@
                       'bg-zinc-50': cell.key === today,
                       'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
                     }"
-                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-100/80 px-1.5 pt-1.5 pb-2 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600 sm:px-2.5 sm:pt-2.5 sm:pb-5"
+                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-100/80 px-1 pt-1.5 pb-2 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600 sm:px-2.5 sm:pt-2.5 sm:pb-5"
                   >
-                    <div class="mb-1.5 flex w-full items-center justify-between gap-1">
+                    <div class="mb-1.5 flex w-full items-center justify-between gap-0.5 sm:gap-1">
                       <span
                         :class="{
                           'text-zinc-300': cell.outside,
@@ -249,7 +249,7 @@
                           'text-zinc-600': !cell.outside && !cell.weekend && cell.key !== today,
                           'bg-zinc-900 text-white': cell.key === today,
                         }"
-                        class="grid size-6 shrink-0 place-items-center rounded-full text-[0.6875rem] font-semibold"
+                        class="grid size-5 shrink-0 place-items-center rounded-full text-[0.6875rem] font-semibold sm:size-6"
                         x-text="cell.day"
                       ></span>
                       <span
