@@ -9,6 +9,17 @@ function calendarApp() {
     return new Date(year, month - 1, day, 12);
   };
   const titleCase = (value) => value.charAt(0).toUpperCase() + value.slice(1);
+  const startOfWeek = (value) => {
+    const date = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 12);
+    date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+    return date;
+  };
+  const addDays = (value, count) => {
+    const date = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 12);
+    date.setDate(date.getDate() + count);
+    return date;
+  };
+  const viewStorageKey = "crm-calendar:view";
   const initialDate = new Date();
 
   const eventTypes = [
@@ -78,6 +89,8 @@ function calendarApp() {
     today: toKey(initialDate),
     currentMonth: new Date(initialDate.getFullYear(), initialDate.getMonth(), 1),
     selectedDate: null,
+    currentWeek: startOfWeek(initialDate),
+    view: "month",
     filter: "all",
     search: "",
     eventTypes,
@@ -104,6 +117,12 @@ function calendarApp() {
     },
 
     init() {
+      try {
+        const stored = window.localStorage.getItem(viewStorageKey);
+        if (stored === "week" || stored === "month") this.view = stored;
+      } catch {
+        // Storage can be unavailable in private browsing.
+      }
       this.generateDemoEvents();
     },
 
@@ -114,6 +133,40 @@ function calendarApp() {
           year: "numeric",
         }).format(this.currentMonth),
       );
+    },
+
+    get calendarTitle() {
+      return this.view === "week" ? this.weekTitle : this.monthTitle;
+    },
+
+    get weekTitle() {
+      const start = this.currentWeek;
+      const end = addDays(start, 6);
+      const month = (date) => new Intl.DateTimeFormat("ru-RU", {
+        day: "numeric",
+        month: "long",
+      }).formatToParts(date).find((part) => part.type === "month").value;
+
+      if (start.getFullYear() !== end.getFullYear()) {
+        return `${start.getDate()} ${month(start)} ${start.getFullYear()} — ${end.getDate()} ${month(end)} ${end.getFullYear()}`;
+      }
+      if (start.getMonth() !== end.getMonth()) {
+        return `${start.getDate()} ${month(start)} — ${end.getDate()} ${month(end)} ${end.getFullYear()}`;
+      }
+      return `${start.getDate()}–${end.getDate()} ${month(end)} ${end.getFullYear()}`;
+    },
+
+    get weekDays() {
+      return Array.from({ length: 7 }, (_, index) => {
+        const date = addDays(this.currentWeek, index);
+        return {
+          key: toKey(date),
+          day: date.getDate(),
+          outside: false,
+          weekend: index >= 5,
+          weekday: new Intl.DateTimeFormat("ru-RU", { weekday: "short" }).format(date),
+        };
+      });
     },
 
     get todayLabel() {
@@ -230,6 +283,10 @@ function calendarApp() {
       return this.cellEvents(cell).length;
     },
 
+    weekDayEvents(day) {
+      return day.weekend ? [] : this.eventsFor(day.key);
+    },
+
     eventsAtHour(hour) {
       return this.timedToday.filter((event) => Number(event.time.slice(0, 2)) === hour);
     },
@@ -252,18 +309,49 @@ function calendarApp() {
       return Math.min(100, (this.eventsFor(date).length / 9) * 100);
     },
 
-    changeMonth(offset) {
-      this.currentMonth = new Date(
-        this.currentMonth.getFullYear(),
-        this.currentMonth.getMonth() + offset,
-        1,
-      );
+    setView(nextView) {
+      if (!["week", "month"].includes(nextView) || nextView === this.view) return;
+
+      if (nextView === "week") {
+        const today = fromKey(this.today);
+        const sameMonth = this.currentMonth.getFullYear() === today.getFullYear()
+          && this.currentMonth.getMonth() === today.getMonth();
+        const focus = sameMonth
+          ? today
+          : new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth(), 15, 12);
+        this.currentWeek = startOfWeek(focus);
+      } else {
+        // Week belongs to the month containing Thursday.
+        const focus = addDays(this.currentWeek, 3);
+        this.currentMonth = new Date(focus.getFullYear(), focus.getMonth(), 1);
+      }
+
+      this.view = nextView;
+      this.selectedDate = null;
+      try {
+        window.localStorage.setItem(viewStorageKey, nextView);
+      } catch {
+        // Calendar interaction is not dependent on storage permissions.
+      }
+    },
+
+    changePeriod(offset) {
+      if (this.view === "week") {
+        this.currentWeek = addDays(this.currentWeek, 7 * offset);
+      } else {
+        this.currentMonth = new Date(
+          this.currentMonth.getFullYear(),
+          this.currentMonth.getMonth() + offset,
+          1,
+        );
+      }
       this.selectedDate = null;
     },
 
     goToday() {
       const date = fromKey(this.today);
       this.currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      this.currentWeek = startOfWeek(date);
       this.selectedDate = null;
     },
 
@@ -361,6 +449,7 @@ function calendarApp() {
 
       const date = fromKey(this.form.date);
       this.currentMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      this.currentWeek = startOfWeek(date);
       this.modalOpen = false;
       this.notify("Событие добавлено в календарь");
     },
