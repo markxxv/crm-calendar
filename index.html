@@ -30,6 +30,7 @@
         --dropdown-min-width: 11.5rem;
         --staff-popover-width: 14rem;
         --staff-picker-width: 15rem;
+        --date-popover-width: 16.5rem;
 
         --status-planned: var(--color-zinc-400);
         --status-progress: var(--color-blue-500);
@@ -750,7 +751,7 @@
         >
           <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
             <div class="flex items-center justify-between gap-3">
-              <div class="flex min-w-0 items-center gap-2 text-[0.6875rem] text-zinc-400">
+              <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[0.6875rem] text-zinc-400">
                 <span
                   class="size-(--event-dot-size) shrink-0 rounded-full"
                   :style="'background-color: var(--event-' + detailEvent.type + ')'"
@@ -758,7 +759,60 @@
                 ></span>
                 <span class="truncate" x-text="typeNames[detailEvent.type]"></span>
                 <span class="text-zinc-300" aria-hidden="true">·</span>
-                <span class="shrink-0" x-text="formatDate(detailEvent.date)"></span>
+                <div class="relative min-w-0">
+                  <button
+                    type="button"
+                    @click="toggleDetailMenu('datePickerOpen')"
+                    :aria-expanded="datePickerOpen"
+                    aria-label="Перенести событие на другую дату"
+                    class="inline-flex max-w-full items-center gap-1.5 text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-zinc-500"
+                  >
+                    <svg class="icon size-3.5 shrink-0" aria-hidden="true">
+                      <use href="#i-calendar"></use>
+                    </svg>
+                    <span
+                      class="truncate border-b border-dashed border-zinc-300 pb-0.5"
+                      x-text="formatDate(detailEvent.date)"
+                    ></span>
+                  </button>
+
+                  <div
+                    x-show="datePickerOpen"
+                    x-cloak
+                    x-transition.opacity.duration.100ms
+                    @click.outside="datePickerOpen = false"
+                    @keydown.escape.stop="datePickerOpen = false"
+                    class="absolute top-full left-0 z-40 mt-2 w-(--date-popover-width) rounded-xl bg-white p-3 shadow-xl ring-1 ring-zinc-200"
+                  >
+                    <label class="block text-[0.6875rem] font-medium text-zinc-500" for="rescheduleDate">
+                      Перенести на
+                    </label>
+                    <input
+                      id="rescheduleDate"
+                      type="date"
+                      :value="detailEvent.date"
+                      @change="rescheduleEvent($event.target.value)"
+                      class="mt-2 h-9 w-full rounded-lg bg-zinc-50 px-2.5 text-xs text-zinc-900 outline-none focus:ring-1 focus:ring-zinc-300"
+                    />
+                    <div class="mt-2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        @click="rescheduleEvent(today)"
+                        class="flex-1 rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                      >Сегодня</button>
+                      <button
+                        type="button"
+                        @click="rescheduleEvent(relativeDate(today, 1))"
+                        class="flex-1 rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                      >Завтра</button>
+                      <button
+                        type="button"
+                        @click="rescheduleEvent(relativeDate(detailEvent.date, 7))"
+                        class="flex-1 rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                      >+7 дней</button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
@@ -790,6 +844,82 @@
                 aria-hidden="true"
               >·</span>
               <span x-show="detailEvent.related" x-text="detailEvent.related"></span>
+            </div>
+
+            <!-- Optional deadline, independent from the event date -->
+            <div class="relative mt-2 flex items-center">
+              <button
+                type="button"
+                @click="toggleDetailMenu('deadlinePickerOpen')"
+                :aria-expanded="deadlinePickerOpen"
+                aria-label="Установить срок выполнения задачи"
+                class="inline-flex items-center gap-1.5 text-xs transition-colors hover:text-zinc-900 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-zinc-500"
+                :class="isOverdue(detailEvent) ? 'text-rose-500' : 'text-zinc-500'"
+              >
+                <svg class="icon size-3.5 shrink-0" aria-hidden="true">
+                  <use href="#i-clock"></use>
+                </svg>
+                <span
+                  class="border-b border-dashed border-zinc-300 pb-0.5"
+                  x-text="detailEvent.deadline
+                    ? 'Дедлайн · ' + formatShortDate(detailEvent.deadline) + (detailEvent.deadlineTime ? ', ' + detailEvent.deadlineTime : '')
+                    : 'Добавить дедлайн'"
+                ></span>
+              </button>
+
+              <div
+                x-show="deadlinePickerOpen"
+                x-cloak
+                x-transition.opacity.duration.100ms
+                @click.outside="deadlinePickerOpen = false"
+                @keydown.escape.stop="deadlinePickerOpen = false"
+                class="absolute top-full left-0 z-40 mt-2 w-(--date-popover-width) rounded-xl bg-white p-3 shadow-xl ring-1 ring-zinc-200"
+              >
+                <div class="grid grid-cols-[minmax(0,1fr)_6rem] gap-2">
+                  <label class="min-w-0">
+                    <span class="text-[0.6875rem] font-medium text-zinc-500">Дедлайн</span>
+                    <input
+                      type="date"
+                      :value="detailEvent.deadline"
+                      @change="setDeadline($event.target.value)"
+                      class="mt-1.5 h-9 w-full min-w-0 rounded-lg bg-zinc-50 px-2 text-xs text-zinc-900 outline-none focus:ring-1 focus:ring-zinc-300"
+                    />
+                  </label>
+                  <label class="min-w-0">
+                    <span class="text-[0.6875rem] font-medium text-zinc-500">Время</span>
+                    <input
+                      type="time"
+                      :value="detailEvent.deadlineTime"
+                      :disabled="!detailEvent.deadline"
+                      @change="setDeadlineTime($event.target.value)"
+                      class="mt-1.5 h-9 w-full min-w-0 rounded-lg bg-zinc-50 px-1 text-xs text-zinc-900 outline-none focus:ring-1 focus:ring-zinc-300 disabled:opacity-40"
+                    />
+                  </label>
+                </div>
+                <div class="mt-2 flex items-center gap-1">
+                  <button
+                    type="button"
+                    @click="setDeadline(today)"
+                    class="rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                  >Сегодня</button>
+                  <button
+                    type="button"
+                    @click="setDeadline(relativeDate(today, 1))"
+                    class="rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                  >Завтра</button>
+                  <button
+                    type="button"
+                    @click="setDeadline(relativeDate(today, 7))"
+                    class="rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-600 hover:bg-zinc-100"
+                  >+7 дней</button>
+                  <button
+                    x-show="detailEvent.deadline"
+                    type="button"
+                    @click="setDeadline('')"
+                    class="ml-auto rounded-md px-2 py-1.5 text-[0.6875rem] text-zinc-400 hover:bg-zinc-100 hover:text-rose-500"
+                  >Очистить</button>
+                </div>
+              </div>
             </div>
 
             <!-- Two compact CRM selectors -->
