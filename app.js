@@ -28,6 +28,37 @@ function calendarApp() {
     reminder: "Напоминание",
   };
 
+  // Only the three confirmed agency team members are used in the prototype.
+  const staff = [
+    {
+      id: "roman",
+      name: "Román Galyautdinov",
+      role: "Founder & Real Estate Expert",
+      photo: "https://spain-costas.com/img/team_01.webp",
+      email: "roman@spain-costas.com",
+      phone: "+34 622 204 413",
+      phoneHref: "tel:+34622204413",
+    },
+    {
+      id: "olga",
+      name: "Olga Shumakova",
+      role: "Residency & Administrative Specialist",
+      photo: "https://spain-costas.com/img/team_03.webp",
+      email: "info@spain-costas.com",
+      phone: "+34 644 23 12 73",
+      phoneHref: "tel:+34644231273",
+    },
+    {
+      id: "alina",
+      name: "Alina Perlova",
+      role: "Business Development & Partnerships Lead",
+      photo: "https://spain-costas.com/img/team_02.webp",
+      email: "alina@spain-costas.com",
+      phone: "+34 694 23 77 36",
+      phoneHref: "tel:+34694237736",
+    },
+  ];
+
   return {
     today: toKey(initialDate),
     currentMonth: new Date(initialDate.getFullYear(), initialDate.getMonth(), 1),
@@ -36,8 +67,11 @@ function calendarApp() {
     search: "",
     eventTypes,
     typeNames,
+    staff,
     events: [],
     nextId: 1,
+    detailEventId: null,
+    employeePickerOpen: false,
     modalOpen: false,
     toastMessage: "",
     toastHandle: null,
@@ -136,6 +170,20 @@ function calendarApp() {
       return this.selectedEvents.filter((event) => !event.time);
     },
 
+    get detailEvent() {
+      return this.events.find((event) => event.id === this.detailEventId) || null;
+    },
+
+    get detailStaff() {
+      if (!this.detailEvent) return [];
+      return this.staff.filter((person) => this.detailEvent.staffIds.includes(person.id));
+    },
+
+    get unassignedStaff() {
+      if (!this.detailEvent) return [];
+      return this.staff.filter((person) => !this.detailEvent.staffIds.includes(person.id));
+    },
+
     eventsFor(date) {
       return this.visibleEvents
         .filter((event) => event.date === date)
@@ -203,6 +251,33 @@ function calendarApp() {
       this.selectedDate = date;
     },
 
+    openEvent(id) {
+      if (!this.events.some((event) => event.id === id)) return;
+
+      this.detailEventId = id;
+      this.employeePickerOpen = false;
+    },
+
+    closeEvent() {
+      this.detailEventId = null;
+      this.employeePickerOpen = false;
+    },
+
+    assignStaff(staffId) {
+      const event = this.detailEvent;
+      if (!event || !this.staff.some((person) => person.id === staffId)) return;
+      if (event.staffIds.includes(staffId)) return;
+
+      event.staffIds = [...event.staffIds, staffId];
+      this.employeePickerOpen = false;
+    },
+
+    removeStaff(staffId) {
+      const event = this.detailEvent;
+      if (!event) return;
+      event.staffIds = event.staffIds.filter((id) => id !== staffId);
+    },
+
     openCreate(date = this.today) {
       this.form = {
         title: "",
@@ -245,7 +320,24 @@ function calendarApp() {
       related = "",
       attention = false,
       done = false,
+      staffIds = null,
     }) {
+      const defaultStaff = {
+        viewing: "roman",
+        call: "alina",
+        docs: "olga",
+        meeting: "roman",
+        reminder: "olga",
+      };
+      const primary = defaultStaff[type] || "roman";
+      // Some demo events have two agents, making the avatar stack meaningful.
+      const secondary = type === "docs" ? "alina" : type === "viewing" ? "alina" : "olga";
+      const assigned = staffIds || (
+        this.nextId % 4 === 0 && primary !== secondary
+          ? [primary, secondary]
+          : [primary]
+      );
+
       this.events.push({
         id: this.nextId++,
         date,
@@ -255,6 +347,7 @@ function calendarApp() {
         related,
         attention,
         done,
+        staffIds: [...new Set(assigned)],
       });
     },
 
@@ -351,7 +444,7 @@ function calendarApp() {
         ["call", "Обратный звонок · Даниэль", "14:15", "Апартаменты Azur"],
         ["viewing", "Повторный просмотр · Penthouse", "15:00", "Клиент Николай"],
         ["reminder", "Подтвердить встречу на понедельник", "17:00", "Риелтор Ольга"],
-      ].forEach(([type, title, time, related, attention = false]) => {
+      ].forEach(([type, title, time, related, attention = false], index) => {
         this.addEvent({
           date: this.today,
           type,
@@ -359,6 +452,13 @@ function calendarApp() {
           time,
           related,
           attention,
+          staffIds: index === 3
+            ? ["roman", "alina"]
+            : index === 5
+              ? ["olga", "roman"]
+              : index === 2
+                ? ["alina", "roman"]
+                : null,
         });
       });
     },
