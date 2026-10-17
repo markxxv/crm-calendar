@@ -227,7 +227,7 @@ function calendarApp() {
           day: date.getDate(),
           outside: false,
           weekend: index >= 5,
-          weekday: new Intl.DateTimeFormat("ru-RU", { weekday: "short" }).format(date),
+          weekday: new Intl.DateTimeFormat("ru-RU", { weekday: "long" }).format(date),
         };
       });
     },
