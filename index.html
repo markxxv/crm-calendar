@@ -1,134 +1,701 @@
 <!doctype html>
 <html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Календарь · Backoffice — UX-прототип</title>
-<style>
-:root{--ink:#151515;--muted:#777;--soft:#a1a1a1;--line:#e9e9e9;--line2:#f1f1f1;--white:#fff;--bg:#fafafa;--blue:#6f8698;--purple:#94809c;--amber:#bd9969;--sage:#7a9988;--gray:#a8a8a8;--font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:#fff;color:var(--ink);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #8a8a8a;outline-offset:2px}button{border:0;background:none;color:inherit}svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}h1,h2,h3,p{margin:0}.app{min-width:650px;min-height:100vh}.topbar{height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 29px;border-bottom:1px solid var(--line);gap:20px}.brand{display:flex;align-items:center;gap:14px}.brandmark{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#181818;color:white}.brandmark svg{width:20px;height:20px}.eyebrow{font-size:10px;letter-spacing:1.3px;font-weight:750;color:#888;text-transform:uppercase}.brandname{font-size:15px;font-weight:640;letter-spacing:-.45px;margin-top:3px}.header-actions{display:flex;align-items:center;gap:12px}.demo-label{font-size:11px;color:#9b9b9b;margin-right:7px}.avatar{height:34px;width:34px;border-radius:50%;background:#eee;display:grid;place-items:center;font-size:11px;font-weight:730;color:#606060;margin-left:6px}.primary{border-radius:7px;background:#171717;color:white;display:flex;align-items:center;gap:8px;padding:11px 15px;font-size:12px;font-weight:650}.primary:hover{background:#353535}.primary svg{width:15px;height:15px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 366px;min-height:calc(100vh - 80px)}.calendar-panel{position:relative;min-width:0;display:flex;flex-direction:column}.calendar-head{padding:25px 29px 20px}.head-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.head-top-left{display:flex;align-items:center;gap:18px}.month-title{font-size:26px;line-height:1.2;font-weight:680;letter-spacing:-1.1px}.nav-row{display:flex;align-items:center;gap:5px}.square-btn{border:1px solid var(--line);border-radius:7px;width:32px;height:32px;display:grid;place-items:center}.square-btn:hover,.ghost-btn:hover{background:#f6f6f6}.square-btn svg{width:16px;height:16px}.ghost-btn{border:1px solid #e6e6e6;border-radius:7px;height:32px;padding:0 12px;font-size:12px;font-weight:590}.top-summary{display:flex;align-items:center;gap:13px;margin-top:11px;color:#929292;font-size:12px}.summary-sep{width:3px;height:3px;border-radius:50%;background:#c5c5c5}.alert-count{color:#555;font-weight:600}.tools-row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:23px;flex-wrap:wrap}.filters{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.chip{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid transparent;border-radius:6px;font-size:11.7px;color:#777;white-space:nowrap}.chip:hover{background:#f8f8f8}.chip.active{background:#f2f2f2;color:#171717;font-weight:680}.dot{display:inline-block;flex-shrink:0;border-radius:50%;width:6px;height:6px;background:var(--gray)}.dot.viewing{background:var(--blue)}.dot.call{background:var(--purple)}.dot.docs{background:var(--amber)}.dot.meeting{background:var(--sage)}.dot.reminder{background:var(--gray)}.search-wrap{position:relative;display:flex;align-items:center;min-width:145px;max-width:220px;flex:1}.search-wrap svg{width:15px;height:15px;position:absolute;left:10px;color:#929292}.search{width:100%;height:34px;padding:0 10px 0 32px;border:1px solid var(--line);border-radius:7px;color:#222;font-size:12px;outline:none}.search::placeholder{color:#aaa}.search:focus{border-color:#aaa}.weekday-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:0 1px}.weekday{padding:12px 14px;color:#979797;font-size:10px;font-weight:760;letter-spacing:.8px;text-transform:uppercase}.weekday.weekend{color:#b0b0b0}.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(139px,1fr);flex:1}.day{min-width:0;position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 10px 28px 12px;transition:background .15s;overflow:hidden;cursor:pointer}.day:nth-child(7n){border-right:0}.day:hover{background:#fafafa}.day.outside{background:#fcfcfc}.day.outside .day-num{color:#c5c5c5}.day.is-today{background:#f9f9f9}.day.is-today:hover{background:#f3f3f3}.day.selected{box-shadow:inset 0 0 0 1.5px #505050;z-index:1}.day-number-row{display:flex;align-items:center;justify-content:space-between;min-height:24px;gap:3px;margin-bottom:8px}.day-num{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;font-size:11px;font-weight:590;color:#5d5d5d}.is-today .day-num{background:#181818;color:white;font-weight:700}.day-total{font-size:10px;color:#bbb;font-weight:650}.cell-events{display:flex;flex-direction:column;gap:8px}.mini-event{display:flex;gap:6px;align-items:center;min-width:0;white-space:nowrap}.mini-event .dot{width:5px;height:5px}.mini-time{font-size:10px;color:#a0a0a0;font-variant-numeric:tabular-nums}.mini-name{font-size:11px;font-weight:560;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#343434;min-width:0}.mini-event.done .mini-name{text-decoration:line-through;color:#aaa}.cell-more{font-size:10px;font-weight:680;color:#6b6b6b;margin:8px 0 0 11px}.load-line{height:2px;width:calc(100% - 24px);background:#efefef;position:absolute;bottom:11px;left:12px;border-radius:1px;overflow:hidden}.load-line:before{content:"";display:block;background:#b0b0b0;width:var(--load);height:100%;border-radius:1px}.day.outside .load-line{display:none}.today-panel{border-left:1px solid var(--line);display:flex;flex-direction:column;height:calc(100vh - 80px);min-height:670px;position:sticky;top:0;min-width:0}.today-head{padding:29px 25px 16px;border-bottom:1px solid var(--line);background:white;flex-shrink:0}.panel-kicker{font-size:10px;text-transform:uppercase;letter-spacing:1.1px;color:#989898;font-weight:800;margin-bottom:9px}.today-title{font-size:22px;letter-spacing:-.8px;font-weight:690}.today-sub{margin-top:8px;color:#969696;font-size:12px}.today-counters{display:flex;gap:7px;margin-top:19px}.counter{padding:6px 9px;border-radius:6px;background:#f6f6f6;color:#676767;font-size:10.5px;font-weight:610}.counter strong{color:#242424}.counter.important{color:#555}.today-body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:28px;scrollbar-width:thin;scrollbar-color:#ddd transparent}.section-label{padding:18px 25px 11px;font-size:10px;color:#999;letter-spacing:.85px;font-weight:760;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}.untimed-list{padding:0 24px 11px;display:flex;flex-direction:column;gap:7px}.untimed-card{border:1px solid #e8e8e8;border-radius:7px;padding:10px 9px;display:flex;align-items:flex-start;gap:9px;min-width:0}.check-task{border:1px solid #c9c9c9;height:16px;width:16px;border-radius:4px;display:grid;place-items:center;flex-shrink:0;margin-top:1px;padding:0}.check-task.done{background:#1d1d1d;border-color:#1d1d1d;color:white}.check-task svg{width:12px;height:12px}.task-copy{flex:1;min-width:0}.task-title{font-size:11.5px;font-weight:640}.task-meta{font-size:10.5px;color:#939393;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.task-done .task-title{text-decoration:line-through;color:#aaa}.timeline{border-top:1px solid var(--line);margin-top:3px}.hour-row{display:grid;grid-template-columns:59px minmax(0,1fr);min-height:56px}.hour-time{border-right:1px solid #ededed;padding:11px 11px 0 23px;color:#9c9c9c;font-size:10.5px;font-variant-numeric:tabular-nums}.hour-slot{border-bottom:1px solid #f4f4f4;min-width:0;padding:5px 22px 6px 12px;display:flex;flex-direction:column;gap:5px}.schedule-event{width:100%;display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border:1px solid #ebebeb;border-radius:6px;background:#fff;min-width:0;cursor:pointer;text-align:left}.schedule-event:hover{background:#f7f7f7;border-color:#ddd}.schedule-event .dot{margin-top:5px}.schedule-details{min-width:0;flex:1}.schedule-name{font-size:11.6px;font-weight:650;line-height:1.35;color:#2f2f2f}.schedule-meta{font-size:10.5px;color:#979797;margin-top:4px;line-height:1.3}.schedule-time{font-size:10px;font-variant-numeric:tabular-nums;color:#8b8b8b;flex-shrink:0;margin-left:auto}.schedule-event.done .schedule-name{text-decoration:line-through;color:#aaa}.schedule-event.done{opacity:.58}.empty{color:#aaa;font-size:12px;padding:26px 0;text-align:center}.day-drawer{position:absolute;top:0;right:0;width:min(400px,92%);height:100%;background:white;z-index:15;border-left:1px solid #e5e5e5;box-shadow:-16px 0 38px rgba(0,0,0,.055);display:flex;flex-direction:column}.drawer-header{padding:27px 23px 20px;border-bottom:1px solid var(--line)}.drawer-headline{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.drawer-title{font-size:21px;letter-spacing:-.6px;font-weight:700;margin-top:6px}.icon-btn{height:30px;width:30px;border-radius:6px;display:grid;place-items:center}.icon-btn:hover{background:#f3f3f3}.drawer-count{color:#939393;font-size:12px;margin-top:10px}.drawer-items{overflow:auto;flex:1;padding:9px 23px 30px}.drawer-section-title{font-size:10px;letter-spacing:1px;font-weight:750;text-transform:uppercase;color:#aaa;margin:20px 0 10px}.drawer-event{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f1f1f1}.drawer-event .dot{margin-top:5px;width:7px;height:7px}.drawer-name{font-size:12px;font-weight:650}.drawer-meta{font-size:11px;color:#999;margin-top:5px;line-height:1.35}.drawer-event.completed .drawer-name{text-decoration:line-through;color:#aaa}.drawer-add{margin:16px 23px 23px;display:flex;justify-content:center;align-items:center;gap:8px;border:1px dashed #cecece;border-radius:7px;padding:12px;color:#555;font-size:12px;font-weight:650}.drawer-add:hover{background:#fafafa}.modal-backdrop{position:fixed;inset:0;background:rgba(10,10,10,.42);z-index:30;display:grid;place-items:center;padding:20px}.modal{width:min(460px,100%);border-radius:12px;background:white;box-shadow:0 20px 80px rgba(0,0,0,.19);padding:24px 25px 22px}.modal h2{font-size:21px;letter-spacing:-.65px}.modal-desc{color:#999;font-size:12px;margin:8px 0 22px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.field label{font-size:11px;color:#646464;font-weight:650}.field input,.field select{width:100%;padding:11px 12px;border:1px solid #dedede;border-radius:7px;outline:none;background:white;color:#222;font-size:12.5px}.field input:focus,.field select:focus{border-color:#808080}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}.modal-actions .primary{justify-content:center}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#242424;border-radius:8px;color:white;z-index:40;padding:11px 16px;box-shadow:0 10px 35px #0002;font-size:12px}.hidden{display:none!important}.panel-footer{border-top:1px solid var(--line);padding:14px 25px;color:#aaa;font-size:10px;line-height:1.5;background:#fff}.panel-footer b{color:#686868}.mobile-pane-switch{display:none}
-@media(max-width:1250px){.workspace{grid-template-columns:minmax(0,1fr) 330px}.topbar{padding:0 21px}.calendar-head{padding:23px 18px 17px}.weekday{padding-left:10px}.day{padding:9px 7px 26px 9px}.mini-time{font-size:9.5px}.mini-name{font-size:10.5px}.cell-events{gap:6px}.chip{padding:6px 8px}.today-head{padding:25px 20px 15px}.today-panel .section-label{padding-left:20px}.untimed-list{padding-left:19px;padding-right:19px}.hour-time{padding-left:15px}.hour-row{grid-template-columns:51px 1fr}.hour-slot{padding-right:14px}.panel-footer{padding:13px 20px}}
-@media(max-width:970px){.workspace{display:block}.today-panel{position:static;height:auto;min-height:0;border-left:0;border-top:1px solid var(--line)}.today-body{max-height:620px}.calendar-panel{min-height:740px}.month-grid{grid-auto-rows:minmax(125px,1fr)}.today-head{padding:23px 26px}.today-counters{margin-top:13px}.demo-label{display:none}}
-@media(max-width:720px){.app{min-width:0}.topbar{padding:0 16px;height:70px}.brand{gap:9px}.brandname{font-size:13px}.brandmark{width:31px;height:31px}.header-actions{gap:5px}.header-actions .avatar{display:none}.primary{padding:10px}.header-actions .primary .btn-caption{display:none}.calendar-head{padding:21px 14px}.month-title{font-size:22px}.head-top-left{gap:10px}.tools-row{align-items:stretch}.filters{overflow-x:auto;flex-wrap:nowrap;max-width:100%;padding-bottom:2px}.search-wrap{max-width:none;flex-basis:100%}.weekday{padding:9px 5px;font-size:9px;text-align:center}.month-grid{grid-auto-rows:minmax(100px,1fr)}.day{padding:7px 3px 19px 5px}.day-num{width:22px;height:22px}.day-number-row{margin:0 0 5px}.cell-events{gap:4px}.mini-event{gap:3px}.mini-event .dot{width:4px;height:4px}.mini-time{display:none}.mini-name{font-size:9px}.cell-more{font-size:9px;margin:5px 0 0 6px}.day-total{font-size:9px}.load-line{left:5px;width:calc(100% - 10px);bottom:7px}.day-drawer{width:94%}.calendar-panel{min-height:700px}.top-summary{font-size:11px}}
-</style>
-</head>
-<body>
-<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
-<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
-<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-<symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
-<symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
-<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></symbol>
-<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
-<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-</defs></svg>
-<div class="app">
-<header class="topbar"><div class="brand"><div class="brandmark"><svg><use href="#i-calendar"/></svg></div><div><div class="eyebrow">Backoffice / Команда</div><div class="brandname">Календарь и задачи</div></div></div><div class="header-actions"><span class="demo-label">Интерактивный прототип · демонстрационные события</span><button class="primary" id="newEvent"><svg><use href="#i-plus"/></svg><span class="btn-caption">Новое событие</span></button><div class="avatar" title="Агент">АМ</div></div></header>
-<main class="workspace">
-<section class="calendar-panel" aria-label="Календарь месяца"><div class="calendar-head"><div class="head-top"><div class="head-top-left"><h1 class="month-title" id="monthTitle">Октябрь 2026</h1><div class="nav-row"><button class="square-btn" id="prevMonth" aria-label="Предыдущий месяц"><svg><use href="#i-left"/></svg></button><button class="square-btn" id="nextMonth" aria-label="Следующий месяц"><svg><use href="#i-right"/></svg></button></div></div><button class="ghost-btn" id="goToday">Сегодня</button></div><div class="top-summary"><span id="monthCount">— событий</span><span class="summary-sep"></span><span id="busyCount">— загруженных дней</span><span class="summary-sep"></span><span class="alert-count" id="attentionCount">— требуют внимания</span></div><div class="tools-row"><div class="filters" id="filters"></div><div class="search-wrap"><svg><use href="#i-search"/></svg><input class="search" id="search" type="search" placeholder="Найти задачу, объект…" aria-label="Поиск событий" /></div></div></div><div class="weekday-grid" id="weekdays"></div><div class="month-grid" id="monthGrid"></div><div class="day-drawer hidden" id="drawer" aria-label="События выбранного дня"></div></section>
-<aside class="today-panel" aria-label="Сегодня по часам"><div class="today-head"><div class="panel-kicker">Ваш день</div><h2 class="today-title">Сегодня <span style="color:#aaa;font-weight:450">· 17 октября</span></h2><div class="today-sub">Суббота <span style="margin:0 7px;color:#ccc">/</span> Всё на одной временной шкале</div><div class="today-counters" id="todayCounters"></div></div><div class="today-body" id="todayBody"></div><div class="panel-footer">Точки обозначают <b>тип события</b>, не степень срочности. Задачи без времени вынесены отдельно.</div></aside>
-</main></div>
-<div class="modal-backdrop hidden" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div style="display:flex;align-items:center;justify-content:space-between"><h2 id="modalTitle">Новое событие</h2><button class="icon-btn" id="closeModal" aria-label="Закрыть"><svg><use href="#i-x"/></svg></button></div><p class="modal-desc">Быстрое создание без перехода на отдельную страницу</p><form id="eventForm"><div class="field"><label for="evTitle">Название *</label><input id="evTitle" required placeholder="Например, показ квартиры в центре" maxlength="120"></div><div class="field"><label for="evType">Тип</label><select id="evType"><option value="viewing">Просмотр недвижимости</option><option value="call">Позвонить</option><option value="docs">Документы</option><option value="meeting">Встреча</option><option value="reminder">Напоминание</option></select></div><div class="field-row"><div class="field"><label for="evDate">Дата</label><input id="evDate" type="date" required></div><div class="field"><label for="evTime">Время (не обязательно)</label><input id="evTime" type="time"></div></div><div class="field"><label for="evLinked">Клиент или объект</label><input id="evLinked" placeholder="Например, Villa Marina · Анна" maxlength="120"></div><div class="modal-actions"><button class="ghost-btn" id="cancelModal" type="button" style="height:38px">Отмена</button><button class="primary" type="submit"><svg><use href="#i-plus"/></svg>Создать</button></div></form></div></div>
-<div class="toast hidden" id="toast" role="status"></div>
-<script>
-(function(){
- const TODAY='2026-10-17';
- const types={all:{label:'Все'},viewing:{label:'Показы'},call:{label:'Звонки'},docs:{label:'Документы'},meeting:{label:'Встречи'},reminder:{label:'Напоминания'}};
- const typeLabels={viewing:'Просмотр недвижимости',call:'Звонок',docs:'Документы',meeting:'Встреча',reminder:'Напоминание'};
- const names=['Villa Sol, Marbella','Penthouse Centro','Вилла Cabo Roig','Квартира у моря','Residencial Marina','Casa Blanca','Таунхаус Park','Апартаменты Azur','Вилла Vista','Квартира Plaza'];
- const people=['Александр','Мария','Николай','Ольга','София','Даниэль','Анастасия','Михаил'];
- const templates={viewing:['Показ · ','Повторный просмотр · ','Осмотр · '],call:['Позвонить клиенту · ','Обсудить предложение · ','Уточнить решение · '],docs:['Отправить документы · ','Проверить договор · ','Подготовить выписку · '],meeting:['Встреча с собственником · ','Встреча в офисе · ','Подписание · '],reminder:['Напомнить об оплате · ','Подтвердить время · ','Проверить ответ · ']};
- const pad=n=>String(n).padStart(2,'0');
- const dateStr=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`;
- const dateObj=s=>{let p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2],12)};
- const escape=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
- const dot=t=>`<span class="dot ${t}" aria-hidden="true"></span>`;
- let allEvents=[],serial=1;
- function push(date,type,title,time='',related='',attention=false){allEvents.push({id:serial++,date,type,title,time,related,attention,done:false});}
- // Deterministic mock data across the month; intentionally a few overloaded days.
- for(let day=1;day<=31;day++){
-   let date=dateStr(2026,9,day),count=(day%7===0?1:2+((day*7+3)%5));
-   if([6,12,19,20,23,28].includes(day))count+=4;
-   if(day===17)continue;
-   let kindOrder=['viewing','call','docs','meeting','reminder'];
-   for(let i=0;i<count;i++){
-    let type=kindOrder[(day*3+i*2)%5],which=(day+i*3)%10,person=people[(day+i)%people.length];
-    let related=type==='call'||type==='reminder'?person:names[which];
-    let title=templates[type][(day+i)%3]+related;
-    let time= i%5===0 ? '' : `${pad(9+(i*3+day)%10)}:${[0,15,30,45][(i+day)%4]}`;
-    push(date,type,title,time,related,(day===15||day===16||day===20)&&i===0);
-   }
- }
- // Deliberately varied, realistic timeline on 17 Oct; both hourly and undated tasks.
- push(TODAY,'docs','Отправить документы по Villa Marina','','Villa Marina · Виктория',true);
- push(TODAY,'reminder','Уточнить статус ипотечного решения','','Клиент Андрей');
- push(TODAY,'call','Позвонить Марии Петровой','09:30','Интересуется квартирой в Alicante');
- push(TODAY,'viewing','Показ · Вилла Cabo Roig','10:00','Клиент София · Calle del Mar');
- push(TODAY,'meeting','Встреча с собственником','11:30','Обсудить условия продажи');
- push(TODAY,'docs','Согласовать договор','13:00','Casa Blanca · Юрист');
- push(TODAY,'call','Обратный звонок · Даниэль','14:15','Апартаменты Azur');
- push(TODAY,'viewing','Повторный просмотр · Penthouse','15:00','Клиент Николай');
- push(TODAY,'reminder','Подтвердить встречу на понедельник','17:00','Риелтор Ольга');
- let current=new Date(2026,9,1),filter='all',query='',selected=null;
- const el=id=>document.getElementById(id);
- const dateFmt=(str,opts)=>new Intl.DateTimeFormat('ru-RU',opts).format(dateObj(str));
- const filtered=()=>allEvents.filter(e=>(filter==='all'||e.type===filter)&&(!query||`${e.title} ${e.related} ${typeLabels[e.type]}`.toLowerCase().includes(query)));
- const forDay=(date)=>filtered().filter(e=>e.date===date).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
- function renderFilters(){el('filters').innerHTML=Object.keys(types).map(t=>`<button type="button" class="chip ${filter===t?'active':''}" data-filter="${t}">${t==='all'?'':dot(t)}${types[t].label}</button>`).join('');el('filters').querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;renderAll()}));}
- function renderMonth(){
-  let year=current.getFullYear(),month=current.getMonth();
-  el('monthTitle').textContent=new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(current).replace(/^./,s=>s.toUpperCase());
-  let monthEvents=filtered().filter(e=>dateObj(e.date).getMonth()===month&&dateObj(e.date).getFullYear()===year);
-  let counted={};monthEvents.forEach(e=>counted[e.date]=(counted[e.date]||0)+1);
-  el('monthCount').textContent=monthEvents.length+' '+(monthEvents.length%10===1&&monthEvents.length%100!==11?'событие':'событий');
-  el('busyCount').textContent=Object.values(counted).filter(n=>n>=6).length+' загруженных дней';
-  el('attentionCount').textContent=monthEvents.filter(e=>e.attention&&!e.done).length+' требуют внимания';
-  let weekdayFirst=(new Date(year,month,1).getDay()+6)%7;
-  let lastDay=new Date(year,month+1,0).getDate();
-  let rows=Math.ceil((weekdayFirst+lastDay)/7),html='';
-  for(let slot=0;slot<rows*7;slot++){
-   let d=new Date(year,month,1-weekdayFirst+slot,12),key=dateStr(d.getFullYear(),d.getMonth(),d.getDate()),outside=d.getMonth()!==month,events=forDay(key),preview=events.slice(0,2),more=events.length-preview.length;
-   let busy=events.length>=6;
-   html+=`<div class="day ${outside?'outside':''} ${key===TODAY?'is-today':''} ${selected===key?'selected':''}" data-day="${key}" role="button" tabindex="0" aria-label="${escape(dateFmt(key,{day:'numeric',month:'long'}))}, событий: ${events.length}"><div class="day-number-row"><span class="day-num">${d.getDate()}</span>${events.length?`<span class="day-total">${events.length>3?events.length:''}</span>`:''}</div><div class="cell-events">${preview.map(e=>`<div class="mini-event ${e.done?'done':''}">${dot(e.type)}${e.time?`<span class="mini-time">${e.time}</span>`:''}<span class="mini-name" title="${escape(e.title)}">${escape(e.title)}</span></div>`).join('')}</div>${more?`<div class="cell-more">+ ещё ${more}</div>`:''}${!outside&&events.length?`<div class="load-line" style="--load:${Math.min(100,events.length/9*100)}%" title="Загрузка: ${events.length} событий"></div>`:''}</div>`;
-  }
-  el('monthGrid').innerHTML=html;
-  el('monthGrid').querySelectorAll('[data-day]').forEach(cell=>{cell.addEventListener('click',()=>openDay(cell.dataset.day));cell.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDay(cell.dataset.day)}})});
- }
- function renderToday(){
-  let events=forDay(TODAY),untimed=events.filter(e=>!e.time),timed=events.filter(e=>e.time),attention=events.filter(e=>e.attention&&!e.done).length;
-  el('todayCounters').innerHTML=`<span class="counter"><strong>${timed.length}</strong> по времени</span><span class="counter"><strong>${untimed.length}</strong> без времени</span>${attention?`<span class="counter important"><strong>${attention}</strong> в фокусе</span>`:''}`;
-  let uhtml=`<div class="section-label">Без привязки ко времени <span>${untimed.length}</span></div><div class="untimed-list">${untimed.length?untimed.map(e=>`<div class="untimed-card ${e.done?'task-done':''}"><button class="check-task ${e.done?'done':''}" aria-label="${e.done?'Возобновить':'Завершить'} задачу" data-complete="${e.id}">${e.done?'<svg><use href="#i-check"/></svg>':''}</button><div class="task-copy"><div class="task-title">${escape(e.title)}</div><div class="task-meta">${escape(e.related||typeLabels[e.type])}${e.attention&&!e.done?' · Требует внимания':''}</div></div>${dot(e.type)}</div>`).join(''):'<div class="empty">Нет задач без времени</div>'}</div>`;
-  let html=uhtml+`<div class="section-label">Расписание по часам <span>${timed.length}</span></div><div class="timeline">`;
-  for(let hour=8;hour<=20;hour++){
-   let hh=pad(hour),group=timed.filter(e=>e.time.startsWith(hh+':'));
-   html+=`<div class="hour-row"><div class="hour-time">${hh}:00</div><div class="hour-slot">${group.map(e=>`<button class="schedule-event ${e.done?'done':''}" data-open-event="${e.id}">${dot(e.type)}<div class="schedule-details"><div class="schedule-name">${escape(e.title)}</div><div class="schedule-meta">${escape(e.related||typeLabels[e.type])}</div></div><div class="schedule-time">${e.time}</div></button>`).join('')}</div></div>`;
-  }
-  el('todayBody').innerHTML=html+'</div>';
-  el('todayBody').querySelectorAll('[data-complete]').forEach(b=>b.addEventListener('click',()=>{let item=allEvents.find(e=>e.id===Number(b.dataset.complete));item.done=!item.done;renderAll()}));
-  el('todayBody').querySelectorAll('[data-open-event]').forEach(b=>b.addEventListener('click',()=>openDay(TODAY)));
- }
- function openDay(date){selected=date;renderMonth();let events=forDay(date),timed=events.filter(e=>e.time),untimed=events.filter(e=>!e.time);
-  let dateTitle=dateFmt(date,{weekday:'long',day:'numeric',month:'long'});dateTitle=dateTitle[0].toUpperCase()+dateTitle.slice(1);
-  let renderItems=(list)=>list.length?list.map(e=>`<div class="drawer-event ${e.done?'completed':''}">${dot(e.type)}<div><div class="drawer-name">${escape(e.title)}</div><div class="drawer-meta">${e.time?e.time+' · ':''}${escape(e.related||typeLabels[e.type])}${e.attention&&!e.done?' · Требует внимания':''}</div></div></div>`).join(''):'<div style="padding:12px 0;color:#aaa">Нет событий</div>';
-  el('drawer').innerHTML=`<div class="drawer-header"><div class="drawer-headline"><div><div class="panel-kicker">Детали дня</div><h2 class="drawer-title">${escape(dateTitle)}</h2></div><button class="icon-btn" id="closeDrawer" aria-label="Закрыть"><svg><use href="#i-x"/></svg></button></div><p class="drawer-count">${events.length} событий · ${untimed.length} без времени</p></div><div class="drawer-items"><div class="drawer-section-title">По времени · ${timed.length}</div>${renderItems(timed)}<div class="drawer-section-title">Без времени · ${untimed.length}</div>${renderItems(untimed)}</div><button class="drawer-add" id="addForDay"><svg><use href="#i-plus"/></svg>Добавить событие на этот день</button>`;
-  el('drawer').classList.remove('hidden');el('closeDrawer').addEventListener('click',closeDrawer);el('addForDay').addEventListener('click',()=>openModal(date));
- }
- function closeDrawer(){selected=null;el('drawer').classList.add('hidden');renderMonth()}
- function renderAll(){renderFilters();renderMonth();renderToday();if(selected)openDay(selected)}
- function openModal(date=TODAY){el('evDate').value=date;el('evTime').value='';el('evTitle').value='';el('evLinked').value='';el('evType').value='viewing';el('modalBackdrop').classList.remove('hidden');setTimeout(()=>el('evTitle').focus(),10)}
- function closeModal(){el('modalBackdrop').classList.add('hidden')}
- let toastTimer;
- function toast(text){el('toast').textContent=text;el('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el('toast').classList.add('hidden'),2500)}
- el('weekdays').innerHTML=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map((t,i)=>`<div class="weekday ${i>=5?'weekend':''}">${t}</div>`).join('');
- el('prevMonth').addEventListener('click',()=>{current=new Date(current.getFullYear(),current.getMonth()-1,1);closeDrawer()});
- el('nextMonth').addEventListener('click',()=>{current=new Date(current.getFullYear(),current.getMonth()+1,1);closeDrawer()});
- el('goToday').addEventListener('click',()=>{current=new Date(2026,9,1);closeDrawer()});
- el('search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();renderAll()});
- el('newEvent').addEventListener('click',()=>openModal());el('closeModal').addEventListener('click',closeModal);el('cancelModal').addEventListener('click',closeModal);
- el('modalBackdrop').addEventListener('click',e=>{if(e.target===el('modalBackdrop'))closeModal()});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(selected)closeDrawer()}});
- el('eventForm').addEventListener('submit',e=>{e.preventDefault();const d=el('evDate').value, t=el('evType').value, title=el('evTitle').value.trim(),time=el('evTime').value,related=el('evLinked').value.trim();if(!d||!title)return;push(d,t,title,time,related);current=new Date(dateObj(d).getFullYear(),dateObj(d).getMonth(),1);closeModal();renderAll();toast('Событие добавлено в календарь')});
- renderAll();
-})();
-</script>
-</body></html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Рабочий календарь агентства недвижимости: месяц, задачи и расписание на сегодня."
+    />
+    <title>Календарь и задачи · Backoffice</title>
+
+    <!-- Tailwind CSS v4 and Alpine.js v3. No build step required for this prototype. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script defer src="./app.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style type="text/tailwindcss">
+      @theme {
+        --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+    </style>
+
+    <style>
+      :root {
+        --header-height: 5rem;
+        --today-panel-width: 23rem;
+        --calendar-min-width: 44rem;
+        --day-min-height: 8.75rem;
+        --panel-min-height: 42rem;
+        --hour-label-width: 3.75rem;
+        --hour-min-height: 3.5rem;
+        --event-dot-size: 0.375rem;
+
+        --event-viewing: #6f8698;
+        --event-call: #94809c;
+        --event-docs: #bd9969;
+        --event-meeting: #7a9988;
+        --event-reminder: #a8a8a8;
+      }
+
+      [x-cloak] {
+        display: none !important;
+      }
+
+      body {
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .icon {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+  </head>
+
+  <body
+    x-data="calendarApp"
+    x-init="init()"
+    @keydown.escape.window="modalOpen = false; selectedDate = null"
+    class="min-h-screen bg-white font-sans text-zinc-900"
+  >
+    <svg aria-hidden="true" class="absolute size-0 overflow-hidden">
+      <defs>
+        <symbol id="i-calendar" viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M16 3v4M8 3v4M3 10h18" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M12 5v14M5 12h14" />
+        </symbol>
+        <symbol id="i-left" viewBox="0 0 24 24">
+          <path d="m15 18-6-6 6-6" />
+        </symbol>
+        <symbol id="i-right" viewBox="0 0 24 24">
+          <path d="m9 18 6-6-6-6" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m16 16 5 5" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="min-h-screen">
+      <!-- Global header -->
+      <header
+        class="flex h-(--header-height) items-center justify-between gap-4 border-b border-zinc-200 px-4 sm:px-6 lg:px-7"
+      >
+        <div class="flex min-w-0 items-center gap-3">
+          <div
+            class="grid size-9 shrink-0 place-items-center rounded-lg bg-zinc-900 text-white"
+          >
+            <svg class="icon size-5" aria-hidden="true">
+              <use href="#i-calendar"></use>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase">
+              Backoffice / Команда
+            </p>
+            <p class="truncate text-sm font-semibold tracking-tight">
+              Календарь и задачи
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="hidden text-xs text-zinc-400 xl:inline">
+            Демонстрационный прототип
+          </span>
+          <button
+            type="button"
+            @click="openCreate()"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
+          >
+            <svg class="icon size-4" aria-hidden="true">
+              <use href="#i-plus"></use>
+            </svg>
+            <span class="hidden sm:inline">Новое событие</span>
+          </button>
+          <span
+            class="hidden size-9 place-items-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500 sm:grid"
+            title="Агент"
+          >
+            АМ
+          </span>
+        </div>
+      </header>
+
+      <main class="min-w-0 lg:grid lg:grid-cols-[minmax(0,1fr)_var(--today-panel-width)]">
+        <!-- Monthly calendar -->
+        <section class="relative flex min-w-0 flex-col" aria-label="Календарь месяца">
+          <div class="px-4 pt-6 pb-5 sm:px-6 lg:px-7">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <h1
+                  class="text-2xl font-semibold tracking-tight sm:text-[1.625rem]"
+                  x-text="monthTitle"
+                ></h1>
+
+                <div class="flex items-center gap-1">
+                  <button
+                    type="button"
+                    @click="changeMonth(-1)"
+                    aria-label="Предыдущий месяц"
+                    class="grid size-8 place-items-center rounded-md border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                  >
+                    <svg class="icon size-4" aria-hidden="true">
+                      <use href="#i-left"></use>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    @click="changeMonth(1)"
+                    aria-label="Следующий месяц"
+                    class="grid size-8 place-items-center rounded-md border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                  >
+                    <svg class="icon size-4" aria-hidden="true">
+                      <use href="#i-right"></use>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                @click="goToday()"
+                class="rounded-md border border-zinc-200 px-3 py-2 text-xs font-medium hover:bg-zinc-50"
+              >
+                Сегодня
+              </button>
+            </div>
+
+            <div
+              class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400"
+              aria-label="Сводка месяца"
+            >
+              <span><span x-text="monthEvents.length"></span> событий</span>
+              <span class="size-1 rounded-full bg-zinc-300"></span>
+              <span><span x-text="busyDays"></span> загруженных дней</span>
+              <span class="size-1 rounded-full bg-zinc-300"></span>
+              <span class="font-medium text-zinc-600">
+                <span x-text="attentionCount"></span> требуют внимания
+              </span>
+            </div>
+
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex max-w-full items-center gap-1 overflow-x-auto pb-1">
+                <template x-for="type in eventTypes" :key="type.id">
+                  <button
+                    type="button"
+                    @click="filter = type.id"
+                    :aria-pressed="filter === type.id"
+                    :class="filter === type.id ? 'bg-zinc-100 font-semibold text-zinc-900' : 'text-zinc-500 hover:bg-zinc-50'"
+                    class="inline-flex shrink-0 items-center gap-2 rounded-md px-2.5 py-2 text-xs transition-colors"
+                  >
+                    <span
+                      x-show="type.id !== 'all'"
+                      class="size-(--event-dot-size) shrink-0 rounded-full"
+                      :style="'background-color: var(--event-' + type.id + ')'"
+                      aria-hidden="true"
+                    ></span>
+                    <span x-text="type.label"></span>
+                  </button>
+                </template>
+              </div>
+
+              <label class="relative block min-w-40 flex-1 sm:max-w-56">
+                <svg
+                  class="icon pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
+                  aria-hidden="true"
+                >
+                  <use href="#i-search"></use>
+                </svg>
+                <input
+                  type="search"
+                  x-model.debounce.150ms="search"
+                  placeholder="Найти задачу, объект…"
+                  aria-label="Поиск событий"
+                  class="h-9 w-full rounded-md border border-zinc-200 bg-white pr-3 pl-9 text-xs outline-none placeholder:text-zinc-400 focus:border-zinc-400"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="min-w-0 overflow-x-auto">
+            <div class="min-w-(--calendar-min-width)">
+              <div class="grid grid-cols-7 border-y border-zinc-200">
+                <template
+                  x-for="(weekday, index) in ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']"
+                  :key="weekday"
+                >
+                  <div
+                    class="px-3 py-3 text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase"
+                    :class="index >= 5 && 'text-zinc-300'"
+                    x-text="weekday"
+                  ></div>
+                </template>
+              </div>
+
+              <div class="grid grid-cols-7 auto-rows-[minmax(var(--day-min-height),1fr)]">
+                <template x-for="cell in calendarDays" :key="cell.key">
+                  <button
+                    type="button"
+                    @click="openDay(cell.key)"
+                    :aria-label="formatDate(cell.key) + ', событий: ' + eventsFor(cell.key).length"
+                    :class="{
+                      'bg-zinc-50/60': cell.outside,
+                      'bg-zinc-50': cell.key === today,
+                      'ring-1 ring-inset ring-zinc-700 z-10': selectedDate === cell.key,
+                    }"
+                    class="group relative flex min-w-0 flex-col border-r border-b border-zinc-200 px-3 pt-3 pb-7 text-left transition-colors hover:bg-zinc-50 focus-visible:z-20 focus-visible:outline-2 focus-visible:outline-zinc-600"
+                  >
+                    <div class="mb-2 flex w-full items-center justify-between gap-1">
+                      <span
+                        :class="{
+                          'text-zinc-300': cell.outside,
+                          'bg-zinc-900 text-white': cell.key === today,
+                        }"
+                        class="grid size-6 shrink-0 place-items-center rounded-full text-xs font-medium text-zinc-600"
+                        x-text="cell.day"
+                      ></span>
+                      <span
+                        class="text-[0.625rem] font-semibold text-zinc-400"
+                        x-show="eventsFor(cell.key).length > 3"
+                        x-text="eventsFor(cell.key).length"
+                      ></span>
+                    </div>
+
+                    <div class="flex min-w-0 w-full flex-col gap-2">
+                      <template
+                        x-for="event in eventsFor(cell.key).slice(0, 2)"
+                        :key="event.id"
+                      >
+                        <div class="flex min-w-0 items-center gap-1.5">
+                          <span
+                            class="size-(--event-dot-size) shrink-0 rounded-full"
+                            :style="'background-color: var(--event-' + event.type + ')'"
+                            aria-hidden="true"
+                          ></span>
+                          <span
+                            x-show="event.time"
+                            class="shrink-0 text-[0.625rem] tabular-nums text-zinc-400"
+                            x-text="event.time"
+                          ></span>
+                          <span
+                            class="min-w-0 truncate text-[0.6875rem] font-medium text-zinc-700"
+                            :class="event.done && 'text-zinc-400 line-through'"
+                            x-text="event.title"
+                            :title="event.title"
+                          ></span>
+                        </div>
+                      </template>
+                    </div>
+
+                    <span
+                      x-show="eventsFor(cell.key).length > 2"
+                      class="mt-2 pl-3 text-[0.625rem] font-semibold text-zinc-500"
+                      x-text="'+ ещё ' + (eventsFor(cell.key).length - 2)"
+                    ></span>
+
+                    <div
+                      x-show="!cell.outside && eventsFor(cell.key).length"
+                      class="absolute right-3 bottom-3 left-3 h-0.5 overflow-hidden rounded-full bg-zinc-100"
+                    >
+                      <div
+                        class="h-full w-(--load) rounded-full bg-zinc-400"
+                        :style="'--load: ' + dayLoad(cell.key) + '%'"
+                      ></div>
+                    </div>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected date: overlay does not replace the Today panel -->
+          <div
+            x-show="selectedDate"
+            x-cloak
+            x-transition.opacity.duration.150ms
+            class="absolute inset-y-0 right-0 z-30 flex w-full flex-col border-l border-zinc-200 bg-white shadow-[-1rem_0_2.5rem_rgb(0_0_0_/_0.06)] sm:w-(--today-panel-width)"
+            aria-label="События выбранного дня"
+          >
+            <div class="border-b border-zinc-200 px-6 pt-7 pb-5">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase">
+                    Детали дня
+                  </p>
+                  <h2
+                    class="mt-2 text-xl font-semibold tracking-tight"
+                    x-text="selectedDate && formatDate(selectedDate)"
+                  ></h2>
+                </div>
+                <button
+                  type="button"
+                  @click="selectedDate = null"
+                  aria-label="Закрыть"
+                  class="grid size-8 place-items-center rounded-md hover:bg-zinc-100"
+                >
+                  <svg class="icon size-4" aria-hidden="true">
+                    <use href="#i-x"></use>
+                  </svg>
+                </button>
+              </div>
+              <p class="mt-2 text-xs text-zinc-400">
+                <span x-text="selectedEvents.length"></span> событий ·
+                <span x-text="selectedUntimed.length"></span> без времени
+              </p>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+              <template
+                x-for="section in [
+                  { label: 'По времени', items: selectedTimed },
+                  { label: 'Без времени', items: selectedUntimed },
+                ]"
+                :key="section.label"
+              >
+                <section class="mt-6">
+                  <h3
+                    class="mb-3 text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase"
+                  >
+                    <span x-text="section.label"></span> ·
+                    <span x-text="section.items.length"></span>
+                  </h3>
+                  <template x-if="section.items.length === 0">
+                    <p class="py-3 text-xs text-zinc-400">Нет событий</p>
+                  </template>
+                  <template x-for="event in section.items" :key="event.id">
+                    <div class="flex gap-3 border-b border-zinc-100 py-3">
+                      <span
+                        class="mt-1.5 size-(--event-dot-size) shrink-0 rounded-full"
+                        :style="'background-color: var(--event-' + event.type + ')'"
+                        aria-hidden="true"
+                      ></span>
+                      <div class="min-w-0">
+                        <p
+                          class="text-xs font-semibold text-zinc-800"
+                          :class="event.done && 'text-zinc-400 line-through'"
+                          x-text="event.title"
+                        ></p>
+                        <p class="mt-1 text-xs leading-relaxed text-zinc-400">
+                          <span x-show="event.time" x-text="event.time + ' · '"></span>
+                          <span x-text="labelFor(event)"></span>
+                          <span
+                            x-show="event.attention && !event.done"
+                            class="text-zinc-600"
+                          >
+                            · Требует внимания
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </template>
+                </section>
+              </template>
+            </div>
+
+            <div class="border-t border-zinc-100 p-6">
+              <button
+                type="button"
+                @click="openCreate(selectedDate)"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-300 py-3 text-xs font-semibold text-zinc-600 hover:bg-zinc-50"
+              >
+                <svg class="icon size-4" aria-hidden="true">
+                  <use href="#i-plus"></use>
+                </svg>
+                Добавить событие на этот день
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hourly agenda: always Today, independent of selected day -->
+        <aside
+          class="flex min-w-0 flex-col border-t border-zinc-200 lg:sticky lg:top-0 lg:h-[calc(100vh-var(--header-height))] lg:min-h-(--panel-min-height) lg:border-t-0 lg:border-l"
+          aria-label="Сегодня по часам"
+        >
+          <div class="shrink-0 border-b border-zinc-200 px-6 pt-7 pb-5">
+            <p class="text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase">
+              Ваш день
+            </p>
+            <h2 class="mt-2 text-[1.375rem] font-semibold tracking-tight">
+              Сегодня
+              <span class="font-normal text-zinc-400">
+                · <span x-text="todayLabel"></span>
+              </span>
+            </h2>
+            <p class="mt-2 text-xs text-zinc-400">
+              <span x-text="todayWeekday"></span> · Всё на одной временной шкале
+            </p>
+
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+              <span class="rounded-md bg-zinc-100 px-2.5 py-1.5 text-[0.6875rem] text-zinc-600">
+                <strong class="text-zinc-900" x-text="timedToday.length"></strong>
+                по времени
+              </span>
+              <span class="rounded-md bg-zinc-100 px-2.5 py-1.5 text-[0.6875rem] text-zinc-600">
+                <strong class="text-zinc-900" x-text="untimedToday.length"></strong>
+                без времени
+              </span>
+              <span
+                x-show="todayAttention"
+                class="rounded-md bg-zinc-100 px-2.5 py-1.5 text-[0.6875rem] text-zinc-600"
+              >
+                <strong class="text-zinc-900" x-text="todayAttention"></strong>
+                в фокусе
+              </span>
+            </div>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-6">
+            <section class="pt-5">
+              <h3
+                class="flex items-center justify-between px-6 pb-3 text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase"
+              >
+                <span>Без привязки ко времени</span>
+                <span x-text="untimedToday.length"></span>
+              </h3>
+
+              <div class="flex flex-col gap-2 px-6 pb-4">
+                <template x-if="untimedToday.length === 0">
+                  <p class="py-4 text-xs text-zinc-400">Нет задач без времени</p>
+                </template>
+
+                <template x-for="event in untimedToday" :key="event.id">
+                  <div class="flex min-w-0 items-start gap-2.5 rounded-lg border border-zinc-200 p-3">
+                    <button
+                      type="button"
+                      @click="toggleComplete(event.id)"
+                      :aria-label="event.done ? 'Возобновить задачу' : 'Завершить задачу'"
+                      :aria-pressed="event.done"
+                      :class="event.done && 'border-zinc-900 bg-zinc-900 text-white'"
+                      class="grid size-4 shrink-0 place-items-center rounded border border-zinc-300"
+                    >
+                      <svg x-show="event.done" class="icon size-3" aria-hidden="true">
+                        <use href="#i-check"></use>
+                      </svg>
+                    </button>
+                    <div class="min-w-0 flex-1">
+                      <p
+                        class="text-xs font-semibold"
+                        :class="event.done && 'text-zinc-400 line-through'"
+                        x-text="event.title"
+                      ></p>
+                      <p class="mt-1 truncate text-[0.6875rem] text-zinc-400">
+                        <span x-text="labelFor(event)"></span>
+                        <span
+                          x-show="event.attention && !event.done"
+                          class="text-zinc-600"
+                        >
+                          · Требует внимания
+                        </span>
+                      </p>
+                    </div>
+                    <span
+                      class="mt-1 size-(--event-dot-size) shrink-0 rounded-full"
+                      :style="'background-color: var(--event-' + event.type + ')'"
+                      aria-hidden="true"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+            </section>
+
+            <section class="border-t border-zinc-200">
+              <h3
+                class="flex items-center justify-between px-6 pt-5 pb-3 text-[0.625rem] font-bold tracking-widest text-zinc-400 uppercase"
+              >
+                <span>Расписание по часам</span>
+                <span x-text="timedToday.length"></span>
+              </h3>
+
+              <div>
+                <template x-for="hour in hours" :key="hour">
+                  <div
+                    class="grid min-h-(--hour-min-height) grid-cols-[var(--hour-label-width)_minmax(0,1fr)]"
+                  >
+                    <div
+                      class="border-r border-zinc-200 py-3 pl-5 text-[0.6875rem] tabular-nums text-zinc-400"
+                      x-text="String(hour).padStart(2, '0') + ':00'"
+                    ></div>
+                    <div class="flex min-w-0 flex-col gap-1.5 border-b border-zinc-100 px-3 py-1.5">
+                      <template x-for="event in eventsAtHour(hour)" :key="event.id">
+                        <button
+                          type="button"
+                          @click="openDay(today)"
+                          class="flex min-w-0 items-start gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-left transition-colors hover:bg-zinc-50"
+                          :class="event.done && 'opacity-60'"
+                        >
+                          <span
+                            class="mt-1 size-(--event-dot-size) shrink-0 rounded-full"
+                            :style="'background-color: var(--event-' + event.type + ')'"
+                            aria-hidden="true"
+                          ></span>
+                          <span class="min-w-0 flex-1">
+                            <span
+                              class="block text-xs font-semibold text-zinc-800"
+                              :class="event.done && 'line-through'"
+                              x-text="event.title"
+                            ></span>
+                            <span
+                              class="mt-1 block truncate text-[0.6875rem] text-zinc-400"
+                              x-text="labelFor(event)"
+                            ></span>
+                          </span>
+                          <span
+                            class="shrink-0 text-[0.625rem] tabular-nums text-zinc-400"
+                            x-text="event.time"
+                          ></span>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </section>
+          </div>
+
+          <div class="shrink-0 border-t border-zinc-200 px-6 py-3 text-[0.6875rem] leading-relaxed text-zinc-400">
+            Цветные точки обозначают тип события, а не его срочность.
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Quick-create dialog -->
+    <div
+      x-show="modalOpen"
+      x-cloak
+      x-transition.opacity.duration.150ms
+      @click.self="modalOpen = false"
+      class="fixed inset-0 z-50 grid place-items-center bg-zinc-950/45 p-4"
+    >
+      <div
+        class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <h2 id="modalTitle" class="text-xl font-semibold tracking-tight">
+            Новое событие
+          </h2>
+          <button
+            type="button"
+            @click="modalOpen = false"
+            aria-label="Закрыть"
+            class="grid size-8 place-items-center rounded-md hover:bg-zinc-100"
+          >
+            <svg class="icon size-4" aria-hidden="true">
+              <use href="#i-x"></use>
+            </svg>
+          </button>
+        </div>
+        <p class="mt-2 mb-6 text-xs text-zinc-400">
+          Быстрое создание без перехода на отдельную страницу
+        </p>
+
+        <form @submit.prevent="createEvent()" class="space-y-4">
+          <label class="block">
+            <span class="mb-2 block text-xs font-semibold text-zinc-600">Название *</span>
+            <input
+              x-ref="eventTitle"
+              x-model="form.title"
+              required
+              maxlength="120"
+              placeholder="Например, показ квартиры в центре"
+              class="w-full rounded-md border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-500"
+            />
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-semibold text-zinc-600">Тип</span>
+            <select
+              x-model="form.type"
+              class="w-full rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-zinc-500"
+            >
+              <template x-for="type in eventTypes.filter((item) => item.id !== 'all')" :key="type.id">
+                <option :value="type.id" x-text="typeNames[type.id]"></option>
+              </template>
+            </select>
+          </label>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="mb-2 block text-xs font-semibold text-zinc-600">Дата</span>
+              <input
+                x-model="form.date"
+                type="date"
+                required
+                class="w-full min-w-0 rounded-md border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-500"
+              />
+            </label>
+            <label class="block">
+              <span class="mb-2 block text-xs font-semibold text-zinc-600">
+                Время (не обязательно)
+              </span>
+              <input
+                x-model="form.time"
+                type="time"
+                class="w-full min-w-0 rounded-md border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-500"
+              />
+            </label>
+          </div>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-semibold text-zinc-600">
+              Клиент или объект
+            </span>
+            <input
+              x-model="form.related"
+              maxlength="120"
+              placeholder="Например, Villa Marina · Анна"
+              class="w-full rounded-md border border-zinc-200 px-3 py-2.5 text-sm outline-none focus:border-zinc-500"
+            />
+          </label>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              @click="modalOpen = false"
+              class="rounded-md border border-zinc-200 px-4 py-2.5 text-xs font-semibold hover:bg-zinc-50"
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2.5 text-xs font-semibold text-white hover:bg-zinc-700"
+            >
+              <svg class="icon size-4" aria-hidden="true">
+                <use href="#i-plus"></use>
+              </svg>
+              Создать
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      x-show="toastMessage"
+      x-cloak
+      x-transition.opacity.duration.150ms
+      role="status"
+      class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-zinc-900 px-4 py-3 text-xs text-white shadow-xl"
+      x-text="toastMessage"
+    ></div>
+  </body>
+</html>
