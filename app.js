@@ -329,18 +329,6 @@ function calendarApp() {
       return options.find((option) => option.id === id) || options[0];
     },
 
-    optionColor(group, id) {
-      const valid = group === "status" ? this.statuses : this.priorities;
-      const selected = this.optionFor(valid, id);
-      return `var(--${group}-${selected.id})`;
-    },
-
-    optionTextColor(group, id) {
-      const valid = group === "status" ? this.statuses : this.priorities;
-      const selected = this.optionFor(valid, id);
-      return `var(--${group}-${selected.id}-text)`;
-    },
-
     eventsFor(date) {
       return this.visibleEvents
         .filter((event) => event.date === date)
