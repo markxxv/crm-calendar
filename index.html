@@ -32,16 +32,25 @@
         --staff-picker-width: 15rem;
         --date-popover-width: 16.5rem;
 
-        --status-planned: var(--color-zinc-400);
-        --status-progress: var(--color-blue-500);
-        --status-waiting: var(--color-amber-500);
-        --status-done: var(--color-green-500);
-        --status-cancelled: var(--color-rose-500);
+        --status-planned: var(--color-zinc-200);
+        --status-planned-text: var(--color-zinc-800);
+        --status-progress: var(--color-blue-600);
+        --status-progress-text: var(--color-white);
+        --status-waiting: var(--color-amber-400);
+        --status-waiting-text: var(--color-zinc-900);
+        --status-done: var(--color-green-400);
+        --status-done-text: var(--color-zinc-900);
+        --status-cancelled: var(--color-rose-600);
+        --status-cancelled-text: var(--color-white);
 
-        --priority-low: var(--color-zinc-400);
-        --priority-normal: var(--color-blue-400);
-        --priority-high: var(--color-amber-500);
-        --priority-urgent: var(--color-rose-500);
+        --priority-low: var(--color-zinc-200);
+        --priority-low-text: var(--color-zinc-800);
+        --priority-normal: var(--color-sky-600);
+        --priority-normal-text: var(--color-white);
+        --priority-high: var(--color-amber-400);
+        --priority-high-text: var(--color-zinc-900);
+        --priority-urgent: var(--color-rose-600);
+        --priority-urgent-text: var(--color-white);
         --day-min-height: 6.75rem;
         --week-column-min-height: 14rem;
         --day-min-height-mobile: 3.5rem;
@@ -65,8 +74,8 @@
       }
 
       .selection-chip {
-        background: #fafafa;
-        background: color-mix(in srgb, var(--selection-color) 11%, white);
+        background-color: var(--selection-color, var(--color-zinc-100));
+        color: var(--selection-text, var(--color-zinc-900));
       }
 
       .icon {
@@ -928,20 +937,19 @@
                   @click="toggleDetailMenu('statusPickerOpen')"
                   :aria-expanded="statusPickerOpen"
                   aria-label="Выбрать статус события"
-                  :style="'--selection-color: ' + optionColor('status', detailEvent.status)"
-                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
+                  :style="'--selection-color: ' + optionColor('status', detailEvent.status) + '; --selection-text: ' + optionTextColor('status', detailEvent.status)"
+                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
                 >
                   <span class="flex min-w-0 items-center gap-2">
                     <svg
                       class="icon size-4 shrink-0"
-                      :style="'color: ' + optionColor('status', detailEvent.status)"
                       aria-hidden="true"
                     >
                       <use :href="'#i-' + optionFor(statuses, detailEvent.status).icon"></use>
                     </svg>
                     <span class="truncate" x-text="optionFor(statuses, detailEvent.status).label"></span>
                   </span>
-                  <svg class="icon size-3 shrink-0 text-zinc-400" aria-hidden="true">
+                  <svg class="icon size-3 shrink-0 opacity-70" aria-hidden="true">
                     <use href="#i-down"></use>
                   </svg>
                 </button>
@@ -959,18 +967,18 @@
                     <button
                       type="button"
                       @click="setStatus(option.id)"
-                      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50"
-                      :class="detailEvent.status === option.id && 'bg-zinc-50 font-semibold'"
+                      :style="'--selection-color: ' + optionColor('status', option.id) + '; --selection-text: ' + optionTextColor('status', option.id)"
+                      class="selection-chip flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs font-medium transition-[filter] hover:brightness-95"
+                      :class="detailEvent.status === option.id && 'font-semibold'"
                     >
                       <svg
                         class="icon size-4 shrink-0"
-                        :style="'color: ' + optionColor('status', option.id)"
                         aria-hidden="true"
                       >
                         <use :href="'#i-' + option.icon"></use>
                       </svg>
                       <span class="flex-1" x-text="option.label"></span>
-                      <svg x-show="detailEvent.status === option.id" class="icon size-3.5 text-zinc-800" aria-hidden="true">
+                      <svg x-show="detailEvent.status === option.id" class="icon size-3.5 opacity-80" aria-hidden="true">
                         <use href="#i-check"></use>
                       </svg>
                     </button>
@@ -987,20 +995,19 @@
                   @click="toggleDetailMenu('priorityPickerOpen')"
                   :aria-expanded="priorityPickerOpen"
                   aria-label="Выбрать приоритет события"
-                  :style="'--selection-color: ' + optionColor('priority', detailEvent.priority)"
-                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium text-zinc-800 transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
+                  :style="'--selection-color: ' + optionColor('priority', detailEvent.priority) + '; --selection-text: ' + optionTextColor('priority', detailEvent.priority)"
+                  class="selection-chip flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-zinc-500"
                 >
                   <span class="flex min-w-0 items-center gap-2">
                     <svg
                       class="icon size-4 shrink-0"
-                      :style="'color: ' + optionColor('priority', detailEvent.priority)"
                       aria-hidden="true"
                     >
                       <use :href="'#i-' + optionFor(priorities, detailEvent.priority).icon"></use>
                     </svg>
                     <span class="truncate" x-text="optionFor(priorities, detailEvent.priority).label"></span>
                   </span>
-                  <svg class="icon size-3 shrink-0 text-zinc-400" aria-hidden="true">
+                  <svg class="icon size-3 shrink-0 opacity-70" aria-hidden="true">
                     <use href="#i-down"></use>
                   </svg>
                 </button>
@@ -1018,18 +1025,18 @@
                     <button
                       type="button"
                       @click="setPriority(option.id)"
-                      class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-700 hover:bg-zinc-50"
-                      :class="detailEvent.priority === option.id && 'bg-zinc-50 font-semibold'"
+                      :style="'--selection-color: ' + optionColor('priority', option.id) + '; --selection-text: ' + optionTextColor('priority', option.id)"
+                      class="selection-chip flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs font-medium transition-[filter] hover:brightness-95"
+                      :class="detailEvent.priority === option.id && 'font-semibold'"
                     >
                       <svg
                         class="icon size-4 shrink-0"
-                        :style="'color: ' + optionColor('priority', option.id)"
                         aria-hidden="true"
                       >
                         <use :href="'#i-' + option.icon"></use>
                       </svg>
                       <span class="flex-1" x-text="option.label"></span>
-                      <svg x-show="detailEvent.priority === option.id" class="icon size-3.5 text-zinc-800" aria-hidden="true">
+                      <svg x-show="detailEvent.priority === option.id" class="icon size-3.5 opacity-80" aria-hidden="true">
                         <use href="#i-check"></use>
                       </svg>
                     </button>
