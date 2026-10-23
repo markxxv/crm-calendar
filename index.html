@@ -945,9 +945,8 @@
                     <button
                       type="button"
                       @click="setStatus(option.id)"
-                      :class="{ 'bg-gray-300': option.id === 'planned', 'bg-blue-400': option.id === 'progress', 'bg-yellow-400': option.id === 'waiting', 'bg-green-400': option.id === 'done', 'bg-red-400': option.id === 'cancelled' }"
+                      :class="{ 'bg-gray-300': option.id === 'planned', 'bg-blue-400': option.id === 'progress', 'bg-yellow-400': option.id === 'waiting', 'bg-green-400': option.id === 'done', 'bg-red-400': option.id === 'cancelled', 'font-semibold': detailEvent.status === option.id }"
                       class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-950 transition-[filter] hover:brightness-95"
-                      :class="detailEvent.status === option.id && 'font-semibold'"
                     >
                       <svg
                         class="icon size-4 shrink-0"
@@ -1003,9 +1002,8 @@
                     <button
                       type="button"
                       @click="setPriority(option.id)"
-                      :class="{ 'bg-gray-300': option.id === 'low', 'bg-blue-400': option.id === 'normal', 'bg-yellow-400': option.id === 'high', 'bg-red-400': option.id === 'urgent' }"
+                      :class="{ 'bg-gray-300': option.id === 'low', 'bg-blue-400': option.id === 'normal', 'bg-yellow-400': option.id === 'high', 'bg-red-400': option.id === 'urgent', 'font-semibold': detailEvent.priority === option.id }"
                       class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-950 transition-[filter] hover:brightness-95"
-                      :class="detailEvent.priority === option.id && 'font-semibold'"
                     >
                       <svg
                         class="icon size-4 shrink-0"
