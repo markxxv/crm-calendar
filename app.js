@@ -204,7 +204,7 @@ function calendarApp() {
 
     get weekTitle() {
       const start = this.currentWeek;
-      const end = addDays(start, 6);
+      const end = addDays(start, 4);
       const month = (date) => new Intl.DateTimeFormat("ru-RU", {
         day: "numeric",
         month: "long",
@@ -220,7 +220,7 @@ function calendarApp() {
     },
 
     get weekDays() {
-      return Array.from({ length: 7 }, (_, index) => {
+      return Array.from({ length: 5 }, (_, index) => {
         const date = addDays(this.currentWeek, index);
         return {
           key: toKey(date),
