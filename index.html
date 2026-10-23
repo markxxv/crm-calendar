@@ -396,9 +396,9 @@
             </div>
           </div>
 
-          <!-- Seven-day overview. Layout becomes stacked on phones and two columns on tablets. -->
+          <!-- Monday-Friday overview; stacked on phones, two columns on tablets. -->
           <div x-show="view === 'week'" x-cloak class="min-w-0">
-            <div class="grid grid-cols-1 gap-px bg-zinc-100 sm:grid-cols-2 xl:grid-cols-7">
+            <div class="grid grid-cols-1 gap-px bg-zinc-100 sm:grid-cols-2 xl:grid-cols-5">
               <template x-for="day in weekDays" :key="day.key">
                 <section
                   :class="day.weekend ? 'bg-zinc-50/80' : day.key === today ? 'bg-blue-50/40' : 'bg-white'"
